@@ -1,5 +1,3 @@
-import i18n from '../configs/i18next.config';
-
 const APPIUM_SESSION_FILE_VERSION = '1.0';
 
 export function getAppiumSessionFilePath(argv, isPackaged, isDev) {
@@ -27,7 +25,5 @@ export function getSaveableState(reduxState) {
     visibleProviders: reduxState.visibleProviders,
   };
 }
-
-export const t = (string, params = null) => i18n.t(string, params);
 
 export const APPIUM_SESSION_EXTENSION = 'appiumsession';
