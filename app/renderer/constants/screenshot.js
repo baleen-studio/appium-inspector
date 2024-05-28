@@ -25,6 +25,7 @@ export const DEFAULT_TAP = {
   DURATION_1: 0,
   DURATION_2: 100,
   BUTTON: 0,
+  VALUE: '',
 };
 
 export const DEFAULT_TEXT = {

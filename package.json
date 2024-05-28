@@ -81,6 +81,8 @@
     "bluebird": "3.7.2",
     "cheerio": "1.0.0-rc.10",
     "electron-log": "4.4.8",
+    "electron-dialogs": "1.4.0",
+    "electron-prompt": "1.7.0",
     "electron-settings": "4.0.4",
     "electron-updater": "6.1.8",
     "highlight.js": "11.9.0",
@@ -100,8 +102,7 @@
     "react-router-dom": "6.23.0",
     "uuid": "9.0.1",
     "web2driver": "3.0.4",
-    "xpath": "0.0.34",
-    "electron-prompt": "1.7.0"
+    "xpath": "0.0.34"
   },
   "//devDependencies": {
     "chai-as-promised": "Abandoned",
@@ -138,6 +139,7 @@
     "electron": "13.6.9",
     "electron-builder": "24.13.3",
     "electron-debug": "3.2.0",
+    "electron-devtools-installer": "^3.2.0",
     "electron-extension-installer": "1.2.0",
     "eslint": "8.57.0",
     "eslint-plugin-import": "2.29.1",

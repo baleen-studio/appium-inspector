@@ -7,11 +7,15 @@ import {INSPECTOR_TABS} from '../../constants/session-inspector';
 import HighlighterRects from './HighlighterRects';
 import styles from './Inspector.css';
 
-const prompt = require('electron-prompt');
-
-const {POINTER_UP, POINTER_DOWN, PAUSE, POINTER_MOVE} = POINTER_TYPES;
-const {ENTER_TEXT} = TEXT_TYPES;
+const {POINTER_UP, POINTER_DOWN, PAUSE, POINTER_MOVE, FOUND_BY} = POINTER_TYPES;
+const {ENTER_TEXT, CHECK_TEXT} = TEXT_TYPES;
 const {TAP, SELECT, SWIPE, TAP_SWIPE, TEXT} = SCREENSHOT_INTERACTION_MODE;
+
+//const { main } = require('electron-dialogs');
+//const { app, BrowserWindow, ipcMain, ipcRenderer } = require('electron');
+const prompt = require('electron-prompt');
+//import PromptManager from "electron-prompts"
+//const prompts = new PromptManager()
 
 /**
  * Shows screenshot of running application and divs that highlight the elements' bounding boxes
@@ -34,6 +38,8 @@ const Screenshot = (props) => {
   const containerEl = useRef();
   const [x, setX] = useState();
   const [y, setY] = useState();
+
+  let that = this;
 
   const handleScreenshotClick = async () => {
     const {tapTickCoordinates} = props;
@@ -59,50 +65,108 @@ const Screenshot = (props) => {
       } else {
         commandRes = await handleDoSwipe({x, y}); // Pass coordEnd because otherwise it is not retrieved
       }
-      if (commandRes.isError == false) {
+      try {
         var message = JSON.parse(commandRes.response.message);
         if (message.type == 'TextField' || message.type == 'TextFormField') {
           (async () => {
+            /*
+            const options = {
+              "title": "Prompt demo",
+              "label":"Fill this input field:", 
+              "value":message.text,
+              "ok": "ok"
+            };
+            ipcRenderer.send('openEnterDIalog', options);
+            */
+            //return commandRes;
             prompt({
               title: message.type,
-              label: 'Enter/Edit text:',
+              label: 'Enter/Edit message:',
               value: message.text,
               inputAttrs: {
-                  type: 'text'
+                type: 'text'
               },
               type: 'input'
-            }, this)
+            })
             .then((r) => {
-                if(r === null) {
-                    console.log('user cancelled');
-                } else {
-                    console.log('result', r);
-                    const {DATA_TYPE} = DEFAULT_TEXT;
-                    const {DURATION_1} = DEFAULT_TAP;
-                    const commandRes = applyClientMethod({
-                      methodName: TEXT,
-                      args: [
-                        {
-                          [DATA_TYPE]: [
-                            {type: POINTER_MOVE, duration: DURATION_1, x: x, y: y},
-                            {type: ENTER_TEXT, text: r},
-                          ],
-                        },
+              if(r === null) {
+                console.log('user cancelled');
+              } else {
+                const {DATA_TYPE} = DEFAULT_TEXT;
+                const {DURATION_1} = DEFAULT_TAP;
+                const commandRes = applyClientMethod({
+                  methodName: TEXT,
+                  args: [
+                    {
+                      [DATA_TYPE]: [
+                        {type: POINTER_MOVE, duration: DURATION_1, x: x, y: y},
+                        {type: ENTER_TEXT, text: r},
+                        {foundBy: '', value: ''},
                       ],
-                    });
-                    return commandRes;
-                }
+                    },
+                  ],
+                });
+              }
             })
             .catch(console.error);
           })();
+        } else if (message.type == 'Label') {
+          (async () => {
+            /*
+            ipcRenderer.send('openCheckDIalog');
+            */
+           /*
+            const pTemplate = {
+              windowTitle: "Label",
+              cancelButton: {
+                classes: ["btn", "btn-secondary"]
+              },
+              elements: [
+                {
+                  type: "header",
+                  value: "Enter test value",
+                },
+                {
+                  type: "paragraph",
+                  value: "Check this value or not:",
+                },
+                {
+                  type: "select",
+                  name: "checkSelect",
+                  options: [
+                      { value: "yes", text: "Check this value", selected: true },
+                      { value: "no", text: "Not check" },
+                  ]
+                },
+                {
+                  type: "input",
+                  name: "checkValue",
+                  placeholder: "",
+                  value: message.text,
+                  classes: ["form-control"],
+                },
+              ],
+              buttons: [
+                {
+                  name: "submit",
+                  value: "Check",
+                  classes: ["btn", "btn-primary"],
+                },
+              ],
+            }
+            const result = await prompts.spawn(pTemplate);
+            */
+          })();
         }
+      } catch (e) {
+        console.log(e);
       }
       clearCoordAction();
     }
   };
 
   const handleDoTap = async (tapLocal) => {
-    const {POINTER_NAME, DURATION_1, DURATION_2, BUTTON} = DEFAULT_TAP;
+    const {POINTER_NAME, DURATION_1, DURATION_2, BUTTON, VALUE} = DEFAULT_TAP;
     const commandRes = await applyClientMethod({
       methodName: TAP,
       args: [
@@ -112,6 +176,7 @@ const Screenshot = (props) => {
             {type: POINTER_DOWN, button: BUTTON},
             {type: PAUSE, duration: DURATION_2},
             {type: POINTER_UP, button: BUTTON},
+            {foundBy: '', value: ''},
           ],
         },
       ],
@@ -135,6 +200,7 @@ const Screenshot = (props) => {
             y: swipeEndLocal.y,
           },
           {type: POINTER_UP, button: BUTTON},
+          {foundBy: '', value: ''},
         ],
       },
     });

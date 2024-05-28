@@ -11,10 +11,12 @@ export const POINTER_TYPES = {
   POINTER_DOWN: 'pointerDown',
   PAUSE: 'pause',
   POINTER_MOVE: 'pointerMove',
+  FOUND_BY: 'foundBy',
 };
 
 export const TEXT_TYPES = {
   ENTER_TEXT: 'enterText',
+  CHECK_TEXT: 'checkText',
 };
 
 export const POINTER_TYPES_MAP = {
@@ -22,6 +24,7 @@ export const POINTER_TYPES_MAP = {
   [POINTER_TYPES.POINTER_DOWN]: 'Pointer Down',
   [POINTER_TYPES.PAUSE]: 'Pause',
   [POINTER_TYPES.POINTER_MOVE]: 'Move',
+  [POINTER_TYPES.FOUND_BY]: 'Found',
 };
 
 // Colors used to distinguish multiple pointers in the same gesture

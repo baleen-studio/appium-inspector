@@ -6,6 +6,8 @@ import i18NextBackend from 'i18next-fs-backend';
 import path from 'path';
 import util from 'util';
 
+process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1';
+
 const i18NextBackendOptions = {
   loadPath: path.join(__dirname, 'locales/{{lng}}/{{ns}}.json'),
   addPath: path.join(__dirname, 'locales/{{lng}}/{{ns}}.json'),

@@ -28,7 +28,7 @@ const languageList = [
 const config = {
   platform: process.platform,
   languages: languageList.map((language) => language.code),
-  fallbackLng: 'en',
+  fallbackLng: 'ja',
   namespace: 'translation',
 };
 

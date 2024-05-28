@@ -56,8 +56,15 @@ main().catch(console.log);`;
     }
   }
 
-  codeFor_text(varName, varIndex) {
-    return `'debug: 'varName', ${varName}, 'varIndex', ${varIndex}'`;
+  codeFor_text(varName, varIndex, pointerActions) {
+    const {x, y, text, foundBy, value} = this.getEnterTextFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      return `await driver.elementSendKeys(find.${foundBy}('${value}'), '${text}t')`;
+    } else {
+      return `await driver.textAction({
+  action: 'enterText', x: ${x}, y: ${y}, text: '${text}'
+});`;
+    }
   }
 
   codeFor_click(varName, varIndex) {
@@ -73,20 +80,29 @@ main().catch(console.log);`;
   }
 
   codeFor_tap(varNameIgnore, varIndexIgnore, pointerActions) {
-    const {x, y} = this.getTapCoordinatesFromPointerActions(pointerActions);
+    const {x, y, foundBy, value} = this.getTapCoordinatesFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      return `await driver.touchAction({
+  action: 'tap',
+  element: { elementId: find.${foundBy}('${value}'); }
+});`;
+    } else {
     return `await driver.touchAction({
   action: 'tap', x: ${x}, y: ${y}
-  debug: 'varName', ${varNameIgnore}, 'varIndex', ${varIndexIgnore}
 });`;
+    }
   }
 
   codeFor_swipe(varNameIgnore, varIndexIgnore, pointerActions) {
-    const {x1, y1, x2, y2} = this.getSwipeCoordinatesFromPointerActions(pointerActions);
-    return `await driver.touchAction([
+    const {x1, y1, x2, y2, foundBy, value} = this.getSwipeCoordinatesFromPointerActions(pointerActions);
+    if (foundBy && value) {
+    } else {
+      return `await driver.touchAction([
   { action: 'press', x: ${x1}, y: ${y1} },
   { action: 'moveTo', x: ${x2}, y: ${y2} },
   'release'
 ]);`;
+    }
   }
 
   // Execute Script

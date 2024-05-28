@@ -57,8 +57,9 @@ ${code}`;
     }
   }
 
-  codeFor_text(varName, varIndex) {
-    return '';
+  codeFor_text(varName, varIndex, pointerActions) {
+    const {x, y, text} = this.getEnterTextFromPointerActions(pointerActions);
+    return `${this.type}.enterText(${x}, ${y}, '${text}'};`;
   }
 
   codeFor_click(varName, varIndex) {

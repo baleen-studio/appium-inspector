@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <input type="checkbox" id="remember-checkbox">Check this value?<br>
+  <input type="text" id="text-input" placeholder="Enter right string">
+  <button onclick="submitData()">Submit</button>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    function submitData() {
+      const isChecked = document.getElementById('remember-checkbox').checked;
+      const textValue = document.getElementById('text-input').value;
+      ipcRenderer.send('dialog-data', { checked: isChecked, text: textValue });
+    }
+  </script>
+</body>
+</html>

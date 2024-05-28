@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import {DEFAULT_SWIPE, DEFAULT_TAP} from '../../constants/screenshot';
+import {DEFAULT_SWIPE, DEFAULT_TAP, DEFAULT_TEXT} from '../../constants/screenshot';
 
 export default class Framework {
   constructor(host, port, path, https, caps) {
@@ -18,18 +18,30 @@ export default class Framework {
 
   getTapCoordinatesFromPointerActions(pointerActions) {
     const pointerMoveAction = pointerActions[DEFAULT_TAP.POINTER_NAME][0];
-    return {x: pointerMoveAction.x, y: pointerMoveAction.y};
+    const causedElements = pointerActions[DEFAULT_TAP.POINTER_NAME][4];
+    return {x: pointerMoveAction.x, y: pointerMoveAction.y,
+      foundBy: causedElements.foundBy, value: causedElements.value};
+  }
+
+  getEnterTextFromPointerActions(pointerActions) {
+    const pointerMoveAction = pointerActions[DEFAULT_TEXT.DATA_TYPE][0];
+    const enterTextAction = pointerActions[DEFAULT_TEXT.DATA_TYPE][1];
+    const causedElements = pointerActions[DEFAULT_TEXT.DATA_TYTPE][2];
+    return {x: pointerMoveAction.x, y: pointerMoveAction.y, text: enterTextAction.text,
+      foundBy: causedElements.foundBy, value: causedElements.value};
   }
 
   getSwipeCoordinatesFromPointerActions(pointerActions) {
     const pointerMoveActionStart = pointerActions[DEFAULT_SWIPE.POINTER_NAME][0];
     const pointerMoveActionEnd = pointerActions[DEFAULT_SWIPE.POINTER_NAME][2];
-
+    const causedElements = pointerActions[DEFAULT_TAP.POINTER_NAME][4];
     return {
       x1: pointerMoveActionStart.x,
       y1: pointerMoveActionStart.y,
       x2: pointerMoveActionEnd.x,
       y2: pointerMoveActionEnd.y,
+      foundBy: causedElements.foundBy,
+      value: causedElements.value,
     };
   }
 
