@@ -2,17 +2,20 @@ import {Spin} from 'antd';
 import React, {useRef, useState} from 'react';
 
 import {GESTURE_ITEM_STYLES, POINTER_TYPES, TEXT_TYPES} from '../../constants/gestures';
-import {DEFAULT_SWIPE, DEFAULT_TAP, SCREENSHOT_INTERACTION_MODE, DEFAULT_TEXT} from '../../constants/screenshot';
+import {DEFAULT_SWIPE, DEFAULT_TAP, SCREENSHOT_INTERACTION_MODE, DEFAULT_TEXT, DEFAULT_CHECK} from '../../constants/screenshot';
+import TextCheckDialog from './TextCheckDialog';
+import TextEnterDialog from './TextEnterDialog';
 import {INSPECTOR_TABS} from '../../constants/session-inspector';
 import HighlighterRects from './HighlighterRects';
 import styles from './Inspector.css';
+import CheckableTag from 'antd/lib/tag/CheckableTag';
 
 const {POINTER_UP, POINTER_DOWN, PAUSE, POINTER_MOVE, FOUND_BY} = POINTER_TYPES;
 const {ENTER_TEXT, CHECK_TEXT} = TEXT_TYPES;
-const {TAP, SELECT, SWIPE, TAP_SWIPE, TEXT} = SCREENSHOT_INTERACTION_MODE;
+const {TAP, SELECT, SWIPE, TAP_SWIPE, TEXT, CHECK} = SCREENSHOT_INTERACTION_MODE;
 
 //const { main } = require('electron-dialogs');
-//const { app, BrowserWindow, ipcMain, ipcRenderer } = require('electron');
+const { ipcRenderer } = require('electron');
 const prompt = require('electron-prompt');
 //import PromptManager from "electron-prompts"
 //const prompts = new PromptManager()
@@ -41,6 +44,59 @@ const Screenshot = (props) => {
 
   let that = this;
 
+  const [checkVisible, setCheckVisible] = useState(false);
+  const [checkText, setCheckText] = useState('');
+  const [enterVisible, setEnterVisible] = useState(false);
+  const [enterText, setEnterText] = useState('');
+  const {foundBy, setFoundBy} = useState('');
+  const {foundValue, setFoundValue} = useState('');
+
+  const handleCloseCheck = async (check, text) => {
+    setCheckVisible(false);
+    if (check) {
+      const {setCoordEnd} = props;
+      await setCoordEnd(x, y);
+      const {DATA_TYPE} = DEFAULT_CHECK;
+      const {DURATION_1} = DEFAULT_TAP;
+      const commandRes = applyClientMethod({
+        methodName: CHECK,
+        args: [
+          {
+            [DATA_TYPE]: [
+              {type: POINTER_MOVE, duration: DURATION_1, x: x, y: y},
+              {type: CHECK_TEXT, text: text},
+              {foundBy: foundBy, value: foundValue},
+            ],
+          },
+        ],
+      });
+      clearCoordAction();
+    }
+  };
+
+  const handleCloseEnter = async (check, text) => {
+    setEnterVisible(false);
+    if (check) {
+      const {setCoordEnd} = props;
+      await setCoordEnd(x, y);
+      const {DATA_TYPE} = DEFAULT_TEXT;
+      const {DURATION_1} = DEFAULT_TAP;
+      const commandRes = applyClientMethod({
+        methodName: TEXT,
+        args: [
+          {
+            [DATA_TYPE]: [
+              {type: POINTER_MOVE, duration: DURATION_1, x: x, y: y},
+              {type: ENTER_TEXT, text: text},
+              {foundBy: foundBy, value: foundValue},
+            ],
+          },
+        ],
+      });
+      clearCoordAction();
+    }
+  };
+
   const handleScreenshotClick = async () => {
     const {tapTickCoordinates} = props;
     if (selectedTick) {
@@ -67,96 +123,24 @@ const Screenshot = (props) => {
       }
       try {
         var message = JSON.parse(commandRes.response.message);
-        if (message.type == 'TextField' || message.type == 'TextFormField') {
-          (async () => {
-            /*
-            const options = {
-              "title": "Prompt demo",
-              "label":"Fill this input field:", 
-              "value":message.text,
-              "ok": "ok"
-            };
-            ipcRenderer.send('openEnterDIalog', options);
-            */
-            //return commandRes;
-            prompt({
-              title: message.type,
-              label: 'Enter/Edit message:',
-              value: message.text,
-              inputAttrs: {
-                type: 'text'
-              },
-              type: 'input'
-            })
-            .then((r) => {
-              if(r === null) {
-                console.log('user cancelled');
-              } else {
-                const {DATA_TYPE} = DEFAULT_TEXT;
-                const {DURATION_1} = DEFAULT_TAP;
-                const commandRes = applyClientMethod({
-                  methodName: TEXT,
-                  args: [
-                    {
-                      [DATA_TYPE]: [
-                        {type: POINTER_MOVE, duration: DURATION_1, x: x, y: y},
-                        {type: ENTER_TEXT, text: r},
-                        {foundBy: '', value: ''},
-                      ],
-                    },
-                  ],
-                });
-              }
-            })
-            .catch(console.error);
-          })();
-        } else if (message.type == 'Label') {
-          (async () => {
-            /*
-            ipcRenderer.send('openCheckDIalog');
-            */
-           /*
-            const pTemplate = {
-              windowTitle: "Label",
-              cancelButton: {
-                classes: ["btn", "btn-secondary"]
-              },
-              elements: [
-                {
-                  type: "header",
-                  value: "Enter test value",
-                },
-                {
-                  type: "paragraph",
-                  value: "Check this value or not:",
-                },
-                {
-                  type: "select",
-                  name: "checkSelect",
-                  options: [
-                      { value: "yes", text: "Check this value", selected: true },
-                      { value: "no", text: "Not check" },
-                  ]
-                },
-                {
-                  type: "input",
-                  name: "checkValue",
-                  placeholder: "",
-                  value: message.text,
-                  classes: ["form-control"],
-                },
-              ],
-              buttons: [
-                {
-                  name: "submit",
-                  value: "Check",
-                  classes: ["btn", "btn-primary"],
-                },
-              ],
-            }
-            const result = await prompts.spawn(pTemplate);
-            */
-          })();
+        switch (message.type) {
+          case 'TextField':
+          case 'TextFormField':
+            (async () => {
+              setEnterVisible(true);
+              setEnterText(message.text);
+              setFoundBy(message.foundBy);
+              setFoundValue(message.value);
+            })();
+            break;
+          case 'Text':
+            (async () => {
+              setCheckVisible(true);
+              setCheckText(message.text);
+              setFoundBy(message.foundBy);
+              setFoundValue(message.value);
+            })();
+            break;
         }
       } catch (e) {
         console.log(e);
@@ -348,6 +332,8 @@ const Screenshot = (props) => {
           )}
         </div>
       </div>
+      <TextCheckDialog visible={checkVisible} text={checkText} onClose={handleCloseCheck} />
+      <TextEnterDialog visible={enterVisible} text={enterText} onClose={handleCloseEnter} />
     </Spin>
   );
 };

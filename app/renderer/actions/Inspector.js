@@ -253,30 +253,32 @@ export function applyClientMethod(params) {
           findAction(dispatch, getState);
         }
 
-        for (let key of Object.keys(params.args)) {
-          //if (!isNumeric(key)) {
-          if (Number(key) != NaN) {
-            let val = params.args[key];
-            let arg = val[Object.keys(val)[0]];
-            for (const sub of arg) {
-              if (Object.keys(sub)[0] == 'foundBy' &&
-                  Object.keys(sub)[1] == 'value') {
-                const json = JSON.parse(commandRes.response.message);
-                console.log(json);
-                sub['foundBy'] = json.foundBy;
-                sub['value'] = json.value;
-              }
-            }
-          } else {
-            let arg = params.args[key];
-            for (const sub of arg) {
-              if (sub.hasOwnProperty('foundBy') &&
-                sub.hasOwnProperty('foundBy')) {
+        if (params.args) {
+          for (let key of Object.keys(params.args)) {
+            //if (!isNumeric(key)) {
+            if (Number(key) != NaN) {
+              let val = params.args[key];
+              let arg = val[Object.keys(val)[0]];
+              for (const sub of arg) {
+                if (Object.keys(sub)[0] == 'foundBy' &&
+                    Object.keys(sub)[1] == 'value') {
                   const json = JSON.parse(commandRes.response.message);
                   console.log(json);
                   sub['foundBy'] = json.foundBy;
                   sub['value'] = json.value;
                 }
+              }
+            } else {
+              let arg = params.args[key];
+              for (const sub of arg) {
+                if (sub.hasOwnProperty('foundBy') &&
+                  sub.hasOwnProperty('foundBy')) {
+                    const json = JSON.parse(commandRes.response.message);
+                    console.log(json);
+                    sub['foundBy'] = json.foundBy;
+                    sub['value'] = json.value;
+                  }
+              }
             }
           }
         }

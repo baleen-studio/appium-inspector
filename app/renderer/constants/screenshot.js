@@ -8,6 +8,7 @@ export const SCREENSHOT_INTERACTION_MODE = {
   TAP_SWIPE: 'tap_swipe',
   GESTURE: 'gesture',
   TEXT: 'text',
+  CHECK: 'check',
 };
 
 // Default parameters when executing coordinate-based swipe over app screenshot
@@ -31,6 +32,12 @@ export const DEFAULT_TAP = {
 export const DEFAULT_TEXT = {
   DATA_TYPE: 'textField',
   NEW_TEXT: 'text',
+  BUTTON: 0,
+}
+
+export const DEFAULT_CHECK = {
+  DATA_TYPE: 'textLabel',
+  NEW_TEXT: 'check',
   BUTTON: 0,
 }
 

@@ -63,7 +63,11 @@ ${this.indent(code, 4)}
     return `$\{${localVar}} =    Set Variable     ${suffixMap[strategy]}=${locator}`;
   }
 
-  codeFor_text(varName, varIndex) {
+  codeFor_text(varName, varIndex, pointerActions) {
+    return '';
+  }
+
+  codeFor_check(varName, varIndex, pointerActions) {
     return '';
   }
 

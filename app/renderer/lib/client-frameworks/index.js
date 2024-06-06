@@ -6,8 +6,10 @@ import JsWdIoFramework from './js-wdio';
 import PythonFramework from './python';
 import RobotFramework from './robot';
 import RubyFramework from './ruby';
+import DartFramework from './dart-integration-test';
 
 const frameworks = {
+  dartFlutter: DartFramework,
   dotNetNUnit: DotNetNUnitFramework,
   jsWdIo: JsWdIoFramework,
   jsOxygen: JsOxygenFramework,

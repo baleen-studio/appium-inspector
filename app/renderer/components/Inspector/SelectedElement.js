@@ -10,6 +10,13 @@ import {Alert, Button, Col, Input, Row, Spin, Table, Tooltip} from 'antd';
 import _ from 'lodash';
 import React, {useRef} from 'react';
 
+import {GESTURE_ITEM_STYLES, POINTER_TYPES, TEXT_TYPES} from '../../constants/gestures';
+import {DEFAULT_SWIPE, DEFAULT_TAP, SCREENSHOT_INTERACTION_MODE} from '../../constants/screenshot';
+const {POINTER_UP, POINTER_DOWN, PAUSE, POINTER_MOVE, FOUND_BY} = POINTER_TYPES;
+const {POINTER_NAME, DURATION_1, DURATION_2, BUTTON, VALUE} = DEFAULT_TAP;
+const {ENTER_TEXT, CHECK_TEXT} = TEXT_TYPES;
+const {TAP, SELECT, SWIPE, TAP_SWIPE, TEXT} = SCREENSHOT_INTERACTION_MODE;
+
 import {ALERT, ROW} from '../../constants/antd-types';
 import {LINKS} from '../../constants/common';
 import {NATIVE_APP} from '../../constants/session-inspector';
@@ -172,7 +179,23 @@ const SelectedElement = (props) => {
             disabled={isDisabled}
             icon={tapIcon}
             id="btnTapElement"
-            onClick={() => applyClientMethod({methodName: 'click', elementId: selectedElementId})}
+            onClick={() => applyClientMethod({
+              methodName: 'click',
+              elementId: selectedElementId,
+              args: [
+                /*
+                {
+                  [POINTER_NAME]: [
+                    {type: POINTER_MOVE, duration: DURATION_1, x: selectedElement.attributes.centerX, y: selectedElement.attributes.centerY},
+                    {type: POINTER_DOWN, button: BUTTON},
+                    {type: PAUSE, duration: DURATION_2},
+                    {type: POINTER_UP, button: BUTTON},
+                    {foundBy: '', value: ''},
+                  ],
+                },
+                */
+              ],
+            })}
           />
         </Tooltip>
         <Button.Group className={styles.elementKeyInputActions}>

@@ -49,102 +49,6 @@ function buildSessionWindow() {
   return window;
 }
 
-/*
-function prepareOpenDialog() {
-  ipcMain.on('openEnterDIalog', (_event, options) => {
-    const win = new BrowserWindow({
-      'width': 360,
-      'height': 120, 
-      'parent': mainWindow,
-      'show': true,
-      'modal': true,
-      'alwaysOnTop' : true, 
-      'title' : options.title,
-      'autoHideMenuBar': true,
-      'webPreferences' : { 
-        "nodeIntegration":true,
-        "sandbox" : false 
-      }   
-    });
-
-    win.on('closed', () => { 
-      win = null;
-    })
-  
-    // Load the HTML dialog box
-    console.log(path.join(__dirname, "enter_text.html"));
-    win.loadURL(path.join(__dirname, "enter_text.html"))
-    //win.once('ready-to-show', () => { win.show() })
-
-    ipcMain.on("openDialog", (event, data) => {
-      event.returnValue = JSON.stringify(options, null, '')
-    });
-  
-    // Called by the dialog box when closed
-    ipcMain.on("closeDialog", (event, data) => {
-      const {DATA_TYPE} = DEFAULT_TEXT;
-      const {DURATION_1} = DEFAULT_TAP;
-      const commandRes = applyClientMethod({
-        methodName: TEXT,
-        args: [
-          {
-            [DATA_TYPE]: [
-              {type: POINTER_MOVE, duration: DURATION_1, x: x, y: y},
-              {type: ENTER_TEXT, text: data},
-            ],
-          },
-        ],
-      });
-    });
-  });
-  ipcMain.on('openCheckDIalog', (_event, options) => {
-    let win = new BrowserWindow({
-      width: 400,
-      height: 200,
-      show: true,
-      modal: true,
-      webPreferences: {
-        nodeIntegration: true, // Needed for IPC communication
-      },
-    });
-  
-    win.loadFile(path.join(__dirname, 'label_check.html'));
-    //win.once('ready-to-show', () => { win.show() })
-  
-    win.on('closed', () => {
-      win = null;
-    });
-  
-    win.on('ipc-message', (event, arg) => {
-      // Handle data received from the dialog (checkbox state, text input value)
-      console.log('Received data from dialog:', arg);
-      if (arg.checked) {
-        const {DATA_TYPE} = DEFAULT_TEXT;
-        const {DURATION_1} = DEFAULT_TAP;
-        const commandRes = applyClientMethod({
-          methodName: TEXT,
-          args: [
-            {
-              [DATA_TYPE]: [
-                {type: POINTER_MOVE, duration: DURATION_1, x: x, y: y},
-                {type: CHECK_TEXT, text: arg.text},
-              ],
-            },
-          ],
-        });
-        //return commandRes;
-      }
-    });
-
-    app.on('window-all-closed', () => {
-      if (process.platform !== 'darwin') {
-        app.quit();
-      }
-    });
-  });
-}
-*/
-
 export function setupMainWindow({splashUrl, mainUrl, isDev}) {
   const splashWindow = buildSplashWindow();
   mainWindow = buildSessionWindow();
@@ -190,8 +94,6 @@ export function setupMainWindow({splashUrl, mainUrl, isDev}) {
       });
     });
   });
-
-  //prepareOpenDialog();
 
   rebuildMenus(mainWindow, isDev);
 }

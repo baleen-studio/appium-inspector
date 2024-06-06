@@ -174,6 +174,12 @@ driver.PerformActions(new List<ActionSequence> { swipe });
     return `_driver.ExecuteScript(${JSON.stringify(scriptCmd)}, ${this.getCSharpVal(jsonArg[0])});`;
   }
 
+  codeFor_text(varName, varIndex, pointerActions) {
+  }
+
+  codeFor_check(varName, varIndex, pointerActions) {
+  }
+
   // App Management
 
   codeFor_getCurrentActivity() {

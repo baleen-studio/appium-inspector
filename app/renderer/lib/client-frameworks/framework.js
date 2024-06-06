@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import {DEFAULT_SWIPE, DEFAULT_TAP, DEFAULT_TEXT} from '../../constants/screenshot';
+import {DEFAULT_SWIPE, DEFAULT_TAP, DEFAULT_TEXT, DEFAULT_CHECK} from '../../constants/screenshot';
 
 export default class Framework {
   constructor(host, port, path, https, caps) {
@@ -26,9 +26,17 @@ export default class Framework {
   getEnterTextFromPointerActions(pointerActions) {
     const pointerMoveAction = pointerActions[DEFAULT_TEXT.DATA_TYPE][0];
     const enterTextAction = pointerActions[DEFAULT_TEXT.DATA_TYPE][1];
-    const causedElements = pointerActions[DEFAULT_TEXT.DATA_TYTPE][2];
+    const causedElements = pointerActions[DEFAULT_TEXT.DATA_TYPE][2];
     return {x: pointerMoveAction.x, y: pointerMoveAction.y, text: enterTextAction.text,
-      foundBy: causedElements.foundBy, value: causedElements.value};
+        foundBy: causedElements.foundBy, value: causedElements.value};
+  }
+
+  getCheckTextFromPointerActions(pointerActions) {
+    const pointerMoveAction = pointerActions[DEFAULT_CHECK.DATA_TYPE][0];
+    const enterTextAction = pointerActions[DEFAULT_CHECK.DATA_TYPE][1];
+    const causedElements = pointerActions[DEFAULT_CHECK.DATA_TYPE][2];
+    return {x: pointerMoveAction.x, y: pointerMoveAction.y, text: enterTextAction.text,
+        foundBy: causedElements.foundBy, value: causedElements.value};
   }
 
   getSwipeCoordinatesFromPointerActions(pointerActions) {

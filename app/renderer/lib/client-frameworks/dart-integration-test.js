@@ -1,31 +1,49 @@
 import Framework from './framework';
 
-class JsWdIoFramework extends Framework {
+function getFindString(foundBy, value) {
+  switch (foundBy) {
+    case 'byValueKey':
+      return `find.byKey(const Key('${value}'))`;
+    case 'byType':
+      return `find.${foundBy}(${value})`;
+    case 'byText':
+      return `find.widgetWithText('${value}')`;
+    case 'byTooltip':
+      return `find.${foundBy}('${value}')`;
+    default:
+      return `find.${foundBy}('${value}')`;
+  }
+}
+
+class DartFramework extends Framework {
   get language() {
-    return 'js';
+    return 'dart';
   }
 
   wrapWithBoilerplate(code) {
-    return `// This sample code supports WebdriverIO client >=7
-// (npm i --save webdriverio)
-// Then paste this into a .js file and run with Node:
-// node <file>.js
+    return `import 'dart:developer';
+    
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart' as ft;
+import 'package:your_package_name/main.dart';
+import 'package:integration_test/integration_test.dart';
 
-import {remote} from 'webdriverio';
-async function main () {
-  const caps = ${JSON.stringify(this.caps, null, 2)}
-  const driver = await remote({
-    protocol: "${this.scheme}",
-    hostname: "${this.host}",
-    port: ${this.port},
-    path: "${this.path}",
-    capabilities: caps
+void main() {
+  group('end-to-end test', () {
+    testWidgets('tap on the floating action button, verify counter',
+      (tester) async {
+      // Load app widget.
+      await tester.pumpWidget(MyApp());
+
+      // start test code
+
+
+
+
+      // end test code
+    });
   });
-${this.indent(code, 2)}
-  await driver.deleteSession();
-}
-
-main().catch(console.log);`;
+}`;
   }
 
   addComment(comment) {
@@ -59,26 +77,21 @@ main().catch(console.log);`;
   codeFor_text(varName, varIndex, pointerActions) {
     const {x, y, text, foundBy, value} = this.getEnterTextFromPointerActions(pointerActions);
     if (!!foundBy && !!value) {
-      return `await driver.elementSendKeys(find.${foundBy}('${value}'), '${text}t');`;
+      const find = getFindString(foundBy, value);
+      return `await tester.enterText(${find}, '${text}');
+await tester.pumpAndSettle();`;
     } else {
-      return `await driver.textAction({
-  action: 'enterText', x: ${x}, y: ${y}, text: '${text}'
-});`;
+      return '';
     }
   }
 
   codeFor_check(varName, varIndex, pointerActions) {
     const {x, y, text, foundBy, value} = this.getCheckTextFromPointerActions(pointerActions);
     if (!!foundBy && !!value) {
-      return `assert.strictEqual(
-  await driver.getElementText(
-    await driver.elementSendKeys(find.${foundBy}('${value}')),
-  '${text}'
-);`;
+      const find = getFindString(foundBy, value);
+      return `expect(${find}, '${text}');`;
     } else {
-      return `await driver.textAction({
-  action: 'enterText', x: ${x}, y: ${y}, text: '${text}'
-});`;
+      return '';
     }
   }
 
@@ -97,21 +110,20 @@ main().catch(console.log);`;
   codeFor_tap(varNameIgnore, varIndexIgnore, pointerActions) {
     const {x, y, foundBy, value} = this.getTapCoordinatesFromPointerActions(pointerActions);
     if (!!foundBy && !!value) {
-      return `await driver.touchAction({
-  action: 'tap',
-  element: { elementId: find.${foundBy}('${value}') }
-});`;
+      const find = getFindString(foundBy, value);
+      return `await tester.tap(${find});
+await tester.pumpAndSettle();`;
     } else {
-    return `await driver.touchAction({
-  action: 'tap', x: ${x}, y: ${y}
-});`;
+      return '';
     }
   }
 
   codeFor_swipe(varNameIgnore, varIndexIgnore, pointerActions) {
     const {x1, y1, x2, y2, foundBy, value} = this.getSwipeCoordinatesFromPointerActions(pointerActions);
     if (foundBy && value) {
-    } else {
+      return `await tester.drag(${find}, const Offset(${x2}, ${y2}));
+await tester.pumpAndSettle();`;
+        } else {
       return `await driver.touchAction([
   { action: 'press', x: ${x1}, y: ${y1} },
   { action: 'moveTo', x: ${x2}, y: ${y2} },
@@ -332,6 +344,6 @@ main().catch(console.log);`;
   }
 }
 
-JsWdIoFramework.readableName = 'JS - Webdriver.io';
+DartFramework.readableName = 'Dart - Integration Test';
 
-export default JsWdIoFramework;
+export default DartFramework;

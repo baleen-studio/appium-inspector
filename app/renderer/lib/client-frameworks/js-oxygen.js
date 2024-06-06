@@ -62,6 +62,10 @@ ${code}`;
     return `${this.type}.enterText(${x}, ${y}, '${text}'};`;
   }
 
+  codeFor_check(varName, varIndex, pointerActions) {
+    return '';
+  }
+
   codeFor_click(varName, varIndex) {
     return `${this.type}.click(${this.getVarName(varName, varIndex)});`;
   }
