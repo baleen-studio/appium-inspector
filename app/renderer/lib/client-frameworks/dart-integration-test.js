@@ -30,7 +30,7 @@ import 'package:integration_test/integration_test.dart';
 
 void main() {
   group('end-to-end test', () {
-    testWidgets('tap on the floating action button, verify counter',
+    testWidgets('your comment for this test',
       (tester) async {
       // Load app widget.
       await tester.pumpWidget(MyApp());
@@ -52,26 +52,7 @@ void main() {
 
   codeFor_findAndAssign(strategy, locator, localVar, isArray) {
     // wdio allows to specify strategy as a locator prefix
-    const validStrategies = [
-      'xpath',
-      'accessibility id',
-      'id',
-      'class name',
-      'name',
-      '-android uiautomator',
-      '-android datamatcher',
-      '-android viewtag',
-      '-ios predicate string',
-      '-ios class chain',
-    ];
-    if (!validStrategies.includes(strategy)) {
-      return this.handleUnsupportedLocatorStrategy(strategy, locator);
-    }
-    if (isArray) {
-      return `const ${localVar} = await driver.$$(${JSON.stringify(`${strategy}:${locator}`)});`;
-    } else {
-      return `const ${localVar} = await driver.$(${JSON.stringify(`${strategy}:${locator}`)});`;
-    }
+    return this.addComment('findAndAssign not supported');
   }
 
   codeFor_text(varName, varIndex, pointerActions) {
@@ -81,7 +62,7 @@ void main() {
       return `await tester.enterText(${find}, '${text}');
 await tester.pumpAndSettle();`;
     } else {
-      return '';
+      return this.addComment('Could not get element information');
     }
   }
 
@@ -91,20 +72,30 @@ await tester.pumpAndSettle();`;
       const find = getFindString(foundBy, value);
       return `expect(${find}, '${text}');`;
     } else {
-      return '';
+      return this.addComment('Could not get element information');
+    }
+  }
+
+  codeFor_existence(varName, varIndex, pointerActions) {
+    const {x, y, text, foundBy, value} = this.getCheckExistenceFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      const find = getFindString(foundBy, value);
+      return `expect(${find}, findsOneWidget);`;
+    } else {
+      return this.addComment('Could not get element information');
     }
   }
 
   codeFor_click(varName, varIndex) {
-    return `await ${this.getVarName(varName, varIndex)}.click();`;
+    return this.addComment('click not supported');
   }
 
   codeFor_clear(varName, varIndex) {
-    return `await ${this.getVarName(varName, varIndex)}.clearValue();`;
+    return this.addComment('clear ot supported');
   }
 
   codeFor_sendKeys(varName, varIndex, text) {
-    return `await ${this.getVarName(varName, varIndex)}.addValue(${JSON.stringify(text)});`;
+    return this.addComment('sendKeys not supported');
   }
 
   codeFor_tap(varNameIgnore, varIndexIgnore, pointerActions) {
@@ -114,13 +105,13 @@ await tester.pumpAndSettle();`;
       return `await tester.tap(${find});
 await tester.pumpAndSettle();`;
     } else {
-      return '';
+      return this.addComment('Could not get element information');
     }
   }
 
   codeFor_swipe(varNameIgnore, varIndexIgnore, pointerActions) {
     const {x1, y1, x2, y2, foundBy, value} = this.getSwipeCoordinatesFromPointerActions(pointerActions);
-    if (foundBy && value) {
+    if (!!foundBy && !!value) {
       return `await tester.drag(${find}, const Offset(${x2}, ${y2}));
 await tester.pumpAndSettle();`;
         } else {
@@ -135,77 +126,75 @@ await tester.pumpAndSettle();`;
   // Execute Script
 
   codeFor_executeScriptNoArgs(scriptCmd) {
-    return `await driver.executeScript(${JSON.stringify(scriptCmd)});`;
+    return this.addComment('executeScriptNoArgs not supported');
   }
 
   codeFor_executeScriptWithArgs(scriptCmd, jsonArg) {
-    return `await driver.executeScript(${JSON.stringify(scriptCmd)}, ${JSON.stringify(jsonArg)});`;
+    return this.addComment('executeScriptWithArgs not supported');
   }
 
   // App Management
 
   codeFor_getCurrentActivity() {
-    return `let activityName = ${this.codeFor_executeScriptNoArgs('mobile: getCurrentActivity')}`;
+    return this.addComment('getCurrentActivity not supported');
   }
 
   codeFor_getCurrentPackage() {
-    return `let packageName = ${this.codeFor_executeScriptNoArgs('mobile: getCurrentPackage')}`;
+    return this.addComment('getCurrentPackage not supported');
   }
 
   codeFor_installApp(varNameIgnore, varIndexIgnore, app) {
-    return `await driver.installApp("${app}");`;
+    return this.addComment('installApp not supported');
   }
 
   codeFor_isAppInstalled(varNameIgnore, varIndexIgnore, app) {
-    return `let isAppInstalled = await driver.isAppInstalled("${app}");`;
+    return this.addComment('isAppInstalled not supported');
   }
 
   codeFor_activateApp(varNameIgnore, varIndexIgnore, app) {
-    return `await driver.activateApp("${app}");`;
+    return this.addComment('activateApp not supported');
   }
 
   codeFor_terminateApp(varNameIgnore, varIndexIgnore, app) {
-    return `await driver.terminateApp("${app}");`;
+    return this.addComment('terminateApp not supported');
   }
 
   codeFor_removeApp(varNameIgnore, varIndexIgnore, app) {
-    return `await driver.removeApp("${app}")`;
+    return this.addComment('removeApp not supported');
   }
 
   codeFor_getStrings(varNameIgnore, varIndexIgnore, language, stringFile) {
-    return `let appStrings = await driver.getStrings(${language ? `"${language}", ` : ''}${
-      stringFile ? `"${stringFile}"` : ''
-    });`;
+    return this.addComment('getStrings not supported');
   }
 
   // Clipboard
 
   codeFor_getClipboard() {
-    return `let clipboardText = await driver.getClipboard();`;
+    return this.addComment('getClipboard not supported');
   }
 
   codeFor_setClipboard(varNameIgnore, varIndexIgnore, clipboardText) {
-    return `await driver.setClipboard("${clipboardText}")`;
+    return this.addComment('setClipboard not supported');
   }
 
   // File Transfer
 
   codeFor_pushFile(varNameIgnore, varIndexIgnore, pathToInstallTo, fileContentString) {
-    return `await driver.pushFile("${pathToInstallTo}", "${fileContentString}");`;
+    return this.addComment('pushFile not supported');
   }
 
   codeFor_pullFile(varNameIgnore, varIndexIgnore, pathToPullFrom) {
-    return `let fileBase64 = await driver.pullFile("${pathToPullFrom}");`;
+    return this.addComment('pullFile not supported');
   }
 
   codeFor_pullFolder(varNameIgnore, varIndexIgnore, folderToPullFrom) {
-    return `let folderBase64 = await driver.pullFolder("${folderToPullFrom}");`;
+    return this.addComment('pullFolder not supported');
   }
 
   // Device Interaction
 
   codeFor_isLocked() {
-    return `let isLocked = ${this.codeFor_executeScriptNoArgs('mobile: isLocked')}`;
+    return this.addComment('isLocked not supported');
   }
 
   codeFor_rotateDevice(
@@ -218,129 +207,129 @@ await tester.pumpAndSettle();`;
     touchCount,
     duration,
   ) {
-    return `await driver.rotateDevice(${x}, ${y}, ${radius}, ${rotation}, ${touchCount}, ${duration});`;
+    return this.addComment('rotateDevice not supported');
   }
 
   codeFor_touchId(varNameIgnore, varIndexIgnore, match) {
-    return `await driver.touchId(${match});`;
+    return this.addComment('touchId not supported');
   }
 
   codeFor_toggleEnrollTouchId(varNameIgnore, varIndexIgnore, enroll) {
-    return `await driver.toggleEnrollTouchId(${enroll});`;
+    return this.addComment('toggleEnrollTouchId not supported');
   }
 
   // Keyboard
 
   codeFor_isKeyboardShown() {
-    return `let isKeyboardShown = await driver.isKeyboardShown();`;
+    return this.addComment('isKeyboardShown not supported');
   }
 
   // Connectivity
 
   codeFor_toggleAirplaneMode() {
-    return `await driver.toggleAirplaneMode();`;
+    return this.addComment('toggleAirplaneMode not supported');
   }
 
   codeFor_toggleData() {
-    return `await driver.toggleData();`;
+    return this.addComment('toggleData not supported');
   }
 
   codeFor_toggleWiFi() {
-    return `await driver.toggleWiFi();`;
+    return this.addComment('toggleWiFi not supported');
   }
 
   codeFor_sendSMS(varNameIgnore, varIndexIgnore, phoneNumber, text) {
-    return `await driver.sendSms("${phoneNumber}", "${text}");`;
+    return this.addComment('sendSMS not supported');
   }
 
   codeFor_gsmCall(varNameIgnore, varIndexIgnore, phoneNumber, action) {
-    return `await driver.gsmCall("${phoneNumber}", "${action}");`;
+    return this.addComment('gsmCall not supported');
   }
 
   codeFor_gsmSignal(varNameIgnore, varIndexIgnore, signalStrength) {
-    return `await driver.gsmSignal("${signalStrength}");`;
+    return this.addComment('gsmSignal not supported');
   }
 
   codeFor_gsmVoice(varNameIgnore, varIndexIgnore, state) {
-    return `await driver.gsmVoice("${state}");`;
+    return this.addComment('gsmVoice not supported');
   }
 
   // Session
 
   codeFor_getSession() {
-    return `let sessionDetails = await driver.getSession();`;
+    return this.addComment('getSession not supported');
   }
 
   codeFor_setTimeouts(/*varNameIgnore, varIndexIgnore, timeoutsJson*/) {
-    return '/* TODO implement setTimeouts */';
+    return this.addComment('setTimeouts not supported');
   }
 
   codeFor_getOrientation() {
-    return `let orientation = await driver.getOrientation();`;
+    return this.addComment('getOrientation not supported');
   }
 
   codeFor_setOrientation(varNameIgnore, varIndexIgnore, orientation) {
-    return `await driver.setOrientation("${orientation}");`;
+    return this.addComment('setOrientation not supported');
   }
 
   codeFor_getGeoLocation() {
-    return `let location = await driver.getGeoLocation();`;
+    return this.addComment('getGeoLocation not supported');
   }
 
   codeFor_setGeoLocation(varNameIgnore, varIndexIgnore, latitude, longitude, altitude) {
-    return `await driver.setGeoLocation({latitude: ${latitude}, longitude: ${longitude}, altitude: ${altitude}});`;
+    return this.addComment('setGeoLocation not supported');
   }
 
   codeFor_getLogTypes() {
-    return `let logTypes = await driver.getLogTypes();`;
+    return this.addComment('getLogType not supported');
   }
 
   codeFor_getLogs(varNameIgnore, varIndexIgnore, logType) {
-    return `let logs = await driver.getLogs("${logType}");`;
+    return this.addComment('getLogs not supported');
   }
 
   codeFor_updateSettings(varNameIgnore, varIndexIgnore, settingsJson) {
-    return `await driver.updateSettings(${JSON.stringify(settingsJson)});`;
+    return this.addComment('updateSettings not supported');
   }
 
   codeFor_getSettings() {
-    return `let settings = await driver.getSettings();`;
+    return this.addComment('getSettings not supported');
   }
 
   // Web
 
   codeFor_navigateTo(varNameIgnore, varIndexIgnore, url) {
-    return `await driver.navigateTo('${url}');`;
+    return this.addComment('navigateTo not supported');
   }
 
   codeFor_getUrl() {
-    return `let current_url = await driver.getUrl();`;
+    return this.addComment('getUrl not supported');
   }
 
   codeFor_back() {
-    return `await driver.back();`;
+    return `await tester.pageBack();`;
   }
 
   codeFor_forward() {
-    return `await driver.forward();`;
+    return this.addComment('forward not supported');
   }
 
   codeFor_refresh() {
-    return `await driver.refresh();`;
+    return this.addComment('refresh not supported');
   }
 
   // Context
 
   codeFor_getContext() {
-    return `let context = await driver.getContext();`;
+    return this.addComment('getContext not supported');
   }
 
   codeFor_getContexts() {
-    return `let contexts = await driver.getContexts();`;
+    return this.addComment('getContexts not supported');
   }
 
   codeFor_switchContext(varNameIgnore, varIndexIgnore, name) {
-    return `await driver.switchContext("${name}");`;
+    return this.addComment('switchContext not supported');
   }
 }
 

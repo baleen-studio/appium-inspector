@@ -9,13 +9,14 @@ export const SCREENSHOT_INTERACTION_MODE = {
   GESTURE: 'gesture',
   TEXT: 'text',
   CHECK: 'check',
+  EXISTENCE: 'existence',
 };
 
 // Default parameters when executing coordinate-based swipe over app screenshot
 export const DEFAULT_SWIPE = {
   POINTER_NAME: 'finger1',
   DURATION_1: 0,
-  DURATION_2: 750,
+  DURATION_2: 750000,
   BUTTON: 0,
   ORIGIN: 'viewport',
 };
@@ -38,6 +39,12 @@ export const DEFAULT_TEXT = {
 export const DEFAULT_CHECK = {
   DATA_TYPE: 'textLabel',
   NEW_TEXT: 'check',
+  BUTTON: 0,
+}
+
+export const DEFAULT_EXISTENCE = {
+  DATA_TYPE: 'everyType',
+  NEW_TEXT: 'existence',
   BUTTON: 0,
 }
 

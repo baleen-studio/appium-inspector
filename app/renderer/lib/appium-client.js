@@ -5,7 +5,7 @@ import {SCREENSHOT_INTERACTION_MODE} from '../constants/screenshot';
 import {APP_MODE, NATIVE_APP} from '../constants/session-inspector';
 import {parseSource, setHtmlElementAttributes} from './webview-helpers';
 
-const {TAP, SWIPE, GESTURE, TEXT, CHECK} = SCREENSHOT_INTERACTION_MODE;
+const {TAP, SWIPE, GESTURE, TEXT, CHECK, EXISTENCE} = SCREENSHOT_INTERACTION_MODE;
 
 // Selector for the Android webview - includes the correct top and bottom boundaries
 const ANDROID_WEBVIEW_SELECTOR = 'android.webkit.WebView';
@@ -119,7 +119,7 @@ export default class AppiumClient {
       res = await cachedEl.el[methodName].apply(cachedEl.el, args);
     } else {
       // Specially handle the tap and swipe method
-      if ([TAP, SWIPE, GESTURE, TEXT, CHECK].includes(methodName)) {
+      if ([TAP, SWIPE, GESTURE, TEXT, CHECK, EXISTENCE].includes(methodName)) {
         const actions = Object.keys(args[0]).map((key) => ({
           type: 'pointer',
           id: key,

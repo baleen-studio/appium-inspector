@@ -82,6 +82,21 @@ main().catch(console.log);`;
     }
   }
 
+  codeFor_existence(varName, varIndex, pointerActions) {
+    const {x, y, text, foundBy, value} = this.getCheckExistenceFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      return `assert.strictEqual(
+  await driver.getElementText(
+    await driver.elementSendKeys(find.${foundBy}('${value}')),
+  '${text}'
+);`;
+    } else {
+      return `await driver.textAction({
+  action: 'enterText', x: ${x}, y: ${y}, text: '${text}'
+});`;
+    }
+  }
+
   codeFor_click(varName, varIndex) {
     return `await ${this.getVarName(varName, varIndex)}.click();`;
   }

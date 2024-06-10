@@ -17,6 +17,7 @@ export const POINTER_TYPES = {
 export const TEXT_TYPES = {
   ENTER_TEXT: 'enterText',
   CHECK_TEXT: 'checkText',
+  CHECK_EXISTENCE: 'checkExistence',
 };
 
 export const POINTER_TYPES_MAP = {

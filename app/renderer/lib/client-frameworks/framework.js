@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import {DEFAULT_SWIPE, DEFAULT_TAP, DEFAULT_TEXT, DEFAULT_CHECK} from '../../constants/screenshot';
+import {DEFAULT_SWIPE, DEFAULT_TAP, DEFAULT_TEXT, DEFAULT_CHECK, DEFAULT_EXISTENCE} from '../../constants/screenshot';
 
 export default class Framework {
   constructor(host, port, path, https, caps) {
@@ -35,6 +35,15 @@ export default class Framework {
     const pointerMoveAction = pointerActions[DEFAULT_CHECK.DATA_TYPE][0];
     const enterTextAction = pointerActions[DEFAULT_CHECK.DATA_TYPE][1];
     const causedElements = pointerActions[DEFAULT_CHECK.DATA_TYPE][2];
+    return {x: pointerMoveAction.x, y: pointerMoveAction.y, text: enterTextAction.text,
+        foundBy: causedElements.foundBy, value: causedElements.value};
+  }
+
+  getCheckExistenceFromPointerActions(pointerActions) {
+    const {DATA_TYPE} = DEFAULT_EXISTENCE;
+    const pointerMoveAction = pointerActions[DATA_TYPE][0];
+    const enterTextAction = pointerActions[DATA_TYPE][1];
+    const causedElements = pointerActions[DATA_TYPE][2];
     return {x: pointerMoveAction.x, y: pointerMoveAction.y, text: enterTextAction.text,
         foundBy: causedElements.foundBy, value: causedElements.value};
   }

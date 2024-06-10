@@ -66,6 +66,10 @@ ${code}`;
     return '';
   }
 
+  codeFor_existence(varName, varIndex, pointerActions) {
+    return '';
+  }
+
   codeFor_click(varName, varIndex) {
     return `${this.type}.click(${this.getVarName(varName, varIndex)});`;
   }

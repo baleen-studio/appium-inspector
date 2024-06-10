@@ -92,6 +92,10 @@ driver.quit()`;
     return '';
   }
 
+  codeFor_existence(varName, varIndex, pointerActions) {
+    return '';
+  }
+
   codeFor_click(varName, varIndex) {
     return `${this.getVarName(varName, varIndex)}.click()`;
   }

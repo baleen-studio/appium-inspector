@@ -87,11 +87,7 @@
     "electron-updater": "6.2.1",
     "highlight.js": "11.9.0",
     "htmlparser2": "7.2.0",
-<<<<<<< HEAD
-    "i18next": "23.11.3",
-=======
     "i18next": "23.11.5",
->>>>>>> 781ba599ea74dc17edfa95371976f564763d6d24
     "i18next-chained-backend": "4.6.2",
     "i18next-fs-backend": "2.3.1",
     "i18next-http-backend": "2.5.2",
@@ -161,13 +157,8 @@
     "postcss-modules": "3.2.2",
     "prettier": "3.3.1",
     "redux-logger": "3.0.6",
-<<<<<<< HEAD
-    "rimraf": "5.0.5",
-    "sinon": "17.0.2",
-=======
     "rimraf": "5.0.7",
     "sinon": "18.0.0",
->>>>>>> 781ba599ea74dc17edfa95371976f564763d6d24
     "spectron": "15.0.0"
   },
   "devEngines": {

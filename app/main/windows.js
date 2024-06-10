@@ -72,6 +72,9 @@ export function setupMainWindow({splashUrl, mainUrl, isDev}) {
     mainWindow = null;
   });
 
+  const handleCloseCheck = async (check, text) => {
+  }
+
   mainWindow.webContents.on('context-menu', (e, props) => {
     const {x, y} = props;
 
@@ -80,6 +83,20 @@ export function setupMainWindow({splashUrl, mainUrl, isDev}) {
         label: i18n.t('Inspect element'),
         click() {
           mainWindow.inspectElement(x, y);
+        },
+      },
+      {
+        label: 'Test this value',
+        click() {
+          mainWindow.webContents.send('check-dialog', 'open');
+        },
+      },
+      {
+        label: 'Check existence',
+        click() {
+          console.log('send Check existence to render process');
+          mainWindow.webContents.postMessage('check-existence', { message: 'hello' }, []);
+          //mainWindow.webContents.send('check-existence', 'open');
         },
       },
     ]).popup(mainWindow);
@@ -94,7 +111,7 @@ export function setupMainWindow({splashUrl, mainUrl, isDev}) {
       });
     });
   });
-
+  
   rebuildMenus(mainWindow, isDev);
 }
 

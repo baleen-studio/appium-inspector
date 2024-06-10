@@ -28,6 +28,7 @@ const TextEnterDialog = ({ visible, text, onClose }) => {
       title="Edit Test"
       open={visible}
       onOk={handleOk}
+      okText="EDIT"
       onCancel={handleCancel}
     >
       <TextArea

@@ -71,6 +71,10 @@ ${this.indent(code, 4)}
     return '';
   }
 
+  codeFor_existence(varName, varIndex, pointerActions) {
+    return '';
+  }
+
   codeFor_click(varName, varIndex) {
     return `Click Element    $\{${this.getVarName(varName, varIndex)}}`;
   }

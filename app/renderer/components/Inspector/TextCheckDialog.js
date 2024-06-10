@@ -34,6 +34,7 @@ const TextCheckDialog = ({ visible, text, onClose }) => {
       title="Test text or not"
       open={visible}
       onOk={handleOk}
+      okText="TEST"
       onCancel={handleCancel}
     >
       <Checkbox onChange={handleCheckboxChange} checked={checkedValue} value="1">Test this text</Checkbox>
