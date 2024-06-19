@@ -129,6 +129,7 @@ export default class AppiumClient {
         res = await this.driver.performActions(actions);
         console.log(res);
       } else if (methodName !== 'getPageSource' && methodName !== 'takeScreenshot') {
+        console.log(this.driver);
         res = await this.driver[methodName].apply(this.driver, args);
       }
     }

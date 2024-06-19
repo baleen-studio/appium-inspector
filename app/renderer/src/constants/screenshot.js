@@ -13,7 +13,7 @@ export const SCREENSHOT_INTERACTION_MODE = {
 export const DEFAULT_SWIPE = {
   POINTER_NAME: 'finger1',
   DURATION_1: 0,
-  DURATION_2: 750,
+  DURATION_2: 750000,
   BUTTON: 0,
   ORIGIN: 'viewport',
 };
@@ -22,7 +22,7 @@ export const DEFAULT_SWIPE = {
 export const DEFAULT_TAP = {
   POINTER_NAME: 'finger1',
   DURATION_1: 0,
-  DURATION_2: 100,
+  DURATION_2: 100000,
   BUTTON: 0,
 };
 

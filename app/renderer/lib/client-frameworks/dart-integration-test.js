@@ -99,11 +99,18 @@ await tester.pumpAndSettle();`;
   }
 
   codeFor_tap(varNameIgnore, varIndexIgnore, pointerActions) {
-    const {x, y, foundBy, value} = this.getTapCoordinatesFromPointerActions(pointerActions);
+    const {x, y, duration, foundBy, value} = this.getTapCoordinatesFromPointerActions(pointerActions);
     if (!!foundBy && !!value) {
-      const find = getFindString(foundBy, value);
-      return `await tester.tap(${find});
+console.log(duration);
+      if (duration > 2000000) {
+        const find = getFindString(foundBy, value);
+        return `await tester.longPress(${find});
 await tester.pumpAndSettle();`;
+      } else {
+        const find = getFindString(foundBy, value);
+        return `await tester.tap(${find});
+await tester.pumpAndSettle();`;
+        }
     } else {
       return this.addComment('Could not get element information');
     }
@@ -112,7 +119,8 @@ await tester.pumpAndSettle();`;
   codeFor_swipe(varNameIgnore, varIndexIgnore, pointerActions) {
     const {x1, y1, x2, y2, foundBy, value} = this.getSwipeCoordinatesFromPointerActions(pointerActions);
     if (!!foundBy && !!value) {
-      return `await tester.drag(${find}, const Offset(${x2}, ${y2}));
+      const find = getFindString(foundBy, value);
+      return `await tester.drag(${find}, const Offset(${x2-x1}, ${y2-y1}));
 await tester.pumpAndSettle();`;
         } else {
       return `await driver.touchAction([

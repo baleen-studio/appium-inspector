@@ -4,7 +4,10 @@ import { Modal, Input } from 'antd';
 const { TextArea } = Input;
 
 const TextEnterDialog = ({ visible, text, onClose }) => {
-  const [textInput, setTextInput] = useState(text);
+  const [textInput, setTextInput] = useState();
+  if (text !== '') {
+    setTextInput(text);
+  }
 
   const handleInputChange = e => {
     setTextInput(e.target.value);

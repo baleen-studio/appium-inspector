@@ -10,6 +10,7 @@ import {INSPECTOR_TABS} from '../../constants/session-inspector';
 import HighlighterRects from './HighlighterRects';
 import styles from './Inspector.css';
 import CheckableTag from 'antd/lib/tag/CheckableTag';
+import { setTappedWidgetInfo } from '../../actions/Inspector';
 
 const {POINTER_UP, POINTER_DOWN, PAUSE, POINTER_MOVE, FOUND_BY} = POINTER_TYPES;
 const {ENTER_TEXT, CHECK_TEXT, CHECK_EXISTENCE} = TEXT_TYPES;
@@ -30,6 +31,7 @@ const Screenshot = (props) => {
     mjpegScreenshotUrl,
     methodCallInProgress,
     screenshotInteractionMode,
+    tappedWidgetInfo,
     coordStart,
     coordEnd,
     scaleRatio,
@@ -46,50 +48,49 @@ const Screenshot = (props) => {
   const [clickY, setClickY] = useState();
   const [checkVisible, setCheckVisible] = useState(false);
   const [enterVisible, setEnterVisible] = useState(false);
+//  const [checkEditing, setCheckEditing] = useState(false);
+//  const [enterEditing, setEnterEditing] = useState(false);
+  const [checkText, setCheckText] = useState('');
+  const [enterText, setEnterText] = useState('');
   const [existenceVisible, setExistenceVisible] = useState(false);
+  const [date,setDate] = useState(new Date());
 
-  let checkText = '';
-  function setCheckText(text) {
-    checkText = text;
-  }
-
-  let enterText = '';
-  function setEnterText(text) {
-    enterText = text;
-  }
-
-  let foundBy = '';
-  function setFoundBy(fby) {
-    foundBy = fby;
-  }
-
-  let foundValue = '';
-  function setFoundValue(value) {
-    foundValue = value;
-  }
-  
-  ipcRenderer.on('check-dialog',  async (event, message) => {
+  ipcRenderer.on('check-dialog',  async (e, m) => {
     if (!checkVisible) {
       const {setCoordEnd, clearCoordAction} = props;
-      await setCoordEnd(x, y);
-      await setClickX(x);
-      await setClickY(y);
-      setCheckVisible(true);
-      setCheckText('');
-      setFoundBy('');
-      setFoundValue('');
-      clearCoordAction();
+      if (!clickX || !clickY) {
+        await setCoordEnd(x, y);
+        await setClickX(x);
+        await setClickY(y);
+        await setCheckVisible(true);
+        clearCoordAction();
+      }
     }
   });
 
-  ipcRenderer.on('check-existence',  async (event, message) => {
+  ipcRenderer.on('enter-dialog',  async (e, m) => {
+    if (!checkVisible) {
+      const {setCoordEnd, clearCoordAction} = props;
+      if (!clickX || !clickY) {
+        await setCoordEnd(x, y);
+        await setClickX(x);
+        await setClickY(y);
+        await setEnterVisible(true);
+        clearCoordAction();
+      }
+    }
+  });
+
+  ipcRenderer.on('check-existence',  async (e, m) => {
     if (!existenceVisible) {
       const {setCoordEnd, clearCoordAction} = props;
-      await setCoordEnd(x, y);
-      await setClickX(x);
-      await setClickY(y);
-      setExistenceVisible(true);
-      clearCoordAction();
+      if (!clickX || !clickY) {
+        await setCoordEnd(x, y);
+        await setClickX(x);
+        await setClickY(y);
+        await setExistenceVisible(true);
+        clearCoordAction();
+      }
     }
   });
 
@@ -103,9 +104,9 @@ const Screenshot = (props) => {
         args: [
           {
             [DATA_TYPE]: [
-              {type: POINTER_MOVE, duration: DURATION_1, x: clickX, y: clickY},
+              {type: POINTER_MOVE, duration: DURATION_1, x: clickX/*tappedWidgetInfo.x*/, y: clickY/*tappedWidgetInfo.y*/},
               {type: CHECK_EXISTENCE, text: ''},
-              {foundBy: foundBy, value: foundValue},
+              {foundBy: tappedWidgetInfo.foundBy, value: tappedWidgetInfo.value},
             ],
           },
         ],
@@ -115,6 +116,7 @@ const Screenshot = (props) => {
 
   const handleCloseCheck = async (check, text) => {
     setCheckVisible(false);
+//    setCheckEditing(false);
     if (check) {
       const {DATA_TYPE} = DEFAULT_CHECK;
       const {DURATION_1} = DEFAULT_TAP;
@@ -123,18 +125,21 @@ const Screenshot = (props) => {
         args: [
           {
             [DATA_TYPE]: [
-              {type: POINTER_MOVE, duration: DURATION_1, x: clickX, y: clickY},
+              {type: POINTER_MOVE, duration: DURATION_1, x: clickX/*tappedWidgetInfo.x*/, y: clickY/*tappedWidgetInfo.y*/},
               {type: CHECK_TEXT, text: text},
-              {foundBy: foundBy, value: foundValue},
+              {foundBy: tappedWidgetInfo.foundBy, value: tappedWidgetInfo.value},
             ],
           },
         ],
       });
+      setClickX(undefined);
+      setClickY(undefined);
     }
   };
 
   const handleCloseEnter = async (check, text) => {
     setEnterVisible(false);
+//    setEnterEditing(false);
     if (check) {
       const {DATA_TYPE} = DEFAULT_TEXT;
       const {DURATION_1} = DEFAULT_TAP;
@@ -143,9 +148,9 @@ const Screenshot = (props) => {
         args: [
           {
             [DATA_TYPE]: [
-              {type: POINTER_MOVE, duration: DURATION_1, x: clickX, y: clickY},
+              {type: POINTER_MOVE, duration: DURATION_1, x: clickX/*tappedWidgetInfo.x*/, y: clickY/*tappedWidgetInfo.y*/},
               {type: ENTER_TEXT, text: text},
-              {foundBy: foundBy, value: foundValue},
+              {foundBy: tappedWidgetInfo.foundBy, value: tappedWidgetInfo.value},
             ],
           },
         ],
@@ -164,6 +169,7 @@ const Screenshot = (props) => {
     const {setCoordStart} = props;
     if (screenshotInteractionMode === TAP_SWIPE) {
       await setCoordStart(x, y);
+      await setDate(new Date());
     }
   };
 
@@ -171,40 +177,51 @@ const Screenshot = (props) => {
     const {setCoordEnd, clearCoordAction} = props;
     if (screenshotInteractionMode === TAP_SWIPE) {
       await setCoordEnd(x, y);
-      await setClickX(x);
-      await setClickY(y);
       var commandRes;
       if (Math.abs(coordStart.x - x) < 5 && Math.abs(coordStart.y - y) < 5) {
         commandRes = await handleDoTap({x, y}); // Pass coordEnd because otherwise it is not retrieved
       } else {
         commandRes = await handleDoSwipe({x, y}); // Pass coordEnd because otherwise it is not retrieved
       }
-      try {
-        var message = JSON.parse(commandRes.response.message);
-        switch (message.type) {
-          case 'TextField':
-          case 'TextFormField':
-            setEnterVisible(true);
-            setEnterText(message.text);
-            setFoundBy(message.foundBy);
-            setFoundValue(message.value);
-            break;
-          case 'Text':
-            setCheckVisible(true);
-            setCheckText(message.text);
-            setFoundBy(message.foundBy);
-            setFoundValue(message.value);
-            break;
+      /*
+      if (commandRes.response) {
+        try {
+          var message = JSON.parse(commandRes.response.message);
+          const tapInfo = {x: x, y: y, text: message.text, foundBy: message.foundBy, value: message.value};
+          setTappedWidgetInfo(tapInfo);
+          switch (message.type) {
+            case 'TextField':
+            case 'TextFormField':
+              await setClickX(x);
+              await setClickY(y);
+//              setEnterText(message.text);
+              setEnterVisible(true);
+//              setEnterEditing(true);
+              break;
+            case 'Text':
+              await setClickX(x);
+              await setClickY(y);
+//              setCheckText(message.text);
+              setCheckVisible(true);
+//              setCheckEditing(true);
+              break;
+          }
+        } catch (e) {
+          console.log(e);
         }
-      } catch (e) {
-        console.log(e);
+      } else {
+        console.log(commandRes);
       }
+        */
       clearCoordAction();
     }
   };
 
   const handleDoTap = async (tapLocal) => {
     const {POINTER_NAME, DURATION_1, DURATION_2, BUTTON, VALUE} = DEFAULT_TAP;
+    const nowDate = new Date();
+    const diff = (nowDate.getTime() - date.getTime()) * 1000;
+    setDate(nowDate);
     const commandRes = await applyClientMethod({
       methodName: TAP,
       args: [
@@ -212,7 +229,7 @@ const Screenshot = (props) => {
           [POINTER_NAME]: [
             {type: POINTER_MOVE, duration: DURATION_1, x: tapLocal.x, y: tapLocal.y},
             {type: POINTER_DOWN, button: BUTTON},
-            {type: PAUSE, duration: DURATION_2},
+            {type: PAUSE, duration: diff/*DURATION_2*/},
             {type: POINTER_UP, button: BUTTON},
             {foundBy: '', value: ''},
           ],
@@ -226,21 +243,23 @@ const Screenshot = (props) => {
     const {POINTER_NAME, DURATION_1, DURATION_2, BUTTON, ORIGIN} = DEFAULT_SWIPE;
     const commandRes = await applyClientMethod({
       methodName: SWIPE,
-      args: {
-        [POINTER_NAME]: [
-          {type: POINTER_MOVE, duration: DURATION_1, x: coordStart.x, y: coordStart.y},
-          {type: POINTER_DOWN, button: BUTTON},
-          {
-            type: POINTER_MOVE,
-            duration: DURATION_2,
-            origin: ORIGIN,
-            x: swipeEndLocal.x,
-            y: swipeEndLocal.y,
-          },
-          {type: POINTER_UP, button: BUTTON},
-          {foundBy: '', value: ''},
-        ],
-      },
+      args: [
+        {
+          [POINTER_NAME]: [
+            {type: POINTER_MOVE, duration: DURATION_1, x: coordStart.x, y: coordStart.y},
+            {type: POINTER_DOWN, button: BUTTON},
+            {
+              type: POINTER_MOVE,
+              duration: DURATION_2,
+              origin: ORIGIN,
+              x: swipeEndLocal.x,
+              y: swipeEndLocal.y,
+            },
+            {type: POINTER_UP, button: BUTTON},
+            {foundBy: '', value: ''},
+          ],
+        }
+      ],
     });
     return commandRes;
   };
@@ -386,9 +405,21 @@ const Screenshot = (props) => {
           )}
         </div>
       </div>
-      <TextCheckDialog visible={checkVisible} text={checkText} onClose={handleCloseCheck} />
-      <TextEnterDialog visible={enterVisible} text={enterText} onClose={handleCloseEnter} />
-      <ConfirmExistanceDialog visible={existenceVisible} onClose={handleCloseExistence} />
+      {checkVisible && (
+        <>
+          <TextCheckDialog visible={checkVisible} text={checkText} onClose={handleCloseCheck} />
+        </>
+      )}
+      {enterVisible && (
+        <>
+          <TextEnterDialog visible={enterVisible} text={enterText} onClose={handleCloseEnter} />
+        </>
+      )}
+      {(
+        <>
+          <ConfirmExistanceDialog visible={existenceVisible} onClose={handleCloseExistence} />
+        </>
+      )}
     </Spin>
   );
 };

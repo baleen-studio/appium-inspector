@@ -98,6 +98,8 @@ export const SET_VISIBLE_COMMAND_RESULT = 'SET_VISIBLE_COMMAND_RESULT';
 
 export const SET_AWAITING_MJPEG_STREAM = 'SET_AWAITING_MJPEG_STREAM';
 
+export const SET_TAPPED_WIDGET_INFO = 'SET_TAPPED_WIDGET_INFO';
+
 export const SHOW_GESTURE_EDITOR = 'SHOW_GESTURE_EDITOR';
 export const HIDE_GESTURE_EDITOR = 'HIDE_GESTURE_EDITOR';
 export const GET_SAVED_GESTURES_REQUESTED = 'GET_SAVED_GESTURES_REQUESTED';
@@ -622,6 +624,12 @@ export function selectScreenshotInteractionMode(screenshotInteractionMode) {
   return (dispatch) => {
     dispatch({type: SET_SCREENSHOT_INTERACTION_MODE, screenshotInteractionMode});
   };
+}
+
+export function setTappedWidgetInfo(info) {
+  return (dispatch) => {
+    dispatch({type: SET_TAPPED_WIDGET_INFO, info});
+  }
 }
 
 export function toggleRefreshingState() {

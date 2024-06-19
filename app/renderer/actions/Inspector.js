@@ -93,6 +93,8 @@ export const SET_VISIBLE_COMMAND_RESULT = 'SET_VISIBLE_COMMAND_RESULT';
 
 export const SET_AWAITING_MJPEG_STREAM = 'SET_AWAITING_MJPEG_STREAM';
 
+export const SET_TAPPED_WIDGET_INFO = 'SET_TAPPED_WIDGET_INFO';
+
 export const SHOW_GESTURE_EDITOR = 'SHOW_GESTURE_EDITOR';
 export const HIDE_GESTURE_EDITOR = 'HIDE_GESTURE_EDITOR';
 export const GET_SAVED_GESTURES_REQUESTED = 'GET_SAVED_GESTURES_REQUESTED';
@@ -253,9 +255,10 @@ export function applyClientMethod(params) {
           findAction(dispatch, getState);
         }
 
+        console.log(params);
+        console.log(commandRes);
         if (params.args) {
           for (let key of Object.keys(params.args)) {
-            //if (!isNumeric(key)) {
             if (Number(key) != NaN) {
               let val = params.args[key];
               let arg = val[Object.keys(val)[0]];
@@ -263,16 +266,11 @@ export function applyClientMethod(params) {
                 for (const sub of arg) {
                   if (Object.keys(sub)[0] == 'foundBy' &&
                       Object.keys(sub)[1] == 'value') {
+                    console.log(commandRes.response);
                     const json = JSON.parse(commandRes.response.message);
-                    console.log(json);
                     sub['foundBy'] = json.foundBy;
                     sub['value'] = json.value;
                   }
-                }
-              } else {
-                if (arg.foundBy && arg.value) {
-                  arg.foundBy = json.foundBy;
-                  arg.value = json.value;
                 }
               }
             }
@@ -646,6 +644,12 @@ export function clearSearchResults() {
 export function selectScreenshotInteractionMode(screenshotInteractionMode) {
   return (dispatch) => {
     dispatch({type: SET_SCREENSHOT_INTERACTION_MODE, screenshotInteractionMode});
+  };
+}
+
+export function setTappedWidgetInfo(tappedWidgetInfo) {
+  return (dispatch) => {
+    dispatch({type: SET_TAPPED_WIDGET_INFO, tappedWidgetInfo});
   };
 }
 

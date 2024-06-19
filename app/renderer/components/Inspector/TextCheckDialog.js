@@ -5,7 +5,10 @@ const { TextArea } = Input;
 
 const TextCheckDialog = ({ visible, text, onClose }) => {
   const [checkedValue, setCheckedValue] = useState(true);
-  const [textInput, setTextInput] = useState(text);
+  const [textInput, setTextInput] = useState();
+  if (text !== '') {
+    setTextInput(text);
+  }
 
   const handleCheckboxChange = checkedValue => {
     setCheckedValue(checkedValue);

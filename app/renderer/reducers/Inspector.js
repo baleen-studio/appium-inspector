@@ -82,6 +82,7 @@ import {
   UNSELECT_HOVERED_CENTROID,
   UNSELECT_HOVERED_ELEMENT,
   UNSELECT_TICK_ELEMENT,
+  SET_TAPPED_WIDGET_INFO,
 } from '../actions/Inspector';
 import {SCREENSHOT_INTERACTION_MODE} from '../constants/screenshot';
 import {APP_MODE, INSPECTOR_TABS, NATIVE_APP} from '../constants/session-inspector';
@@ -113,6 +114,7 @@ const INITIAL_STATE = {
   isSearchingForElements: false,
   assignedVarCache: {},
   screenshotInteractionMode: SCREENSHOT_INTERACTION_MODE.SELECT,
+  tappedWidgetInfo: {},
   searchedForElementBounds: null,
   selectedInspectorTab: INSPECTOR_TABS.SOURCE,
   appMode: APP_MODE.NATIVE,
@@ -420,6 +422,12 @@ export default function inspector(state = INITIAL_STATE, action) {
         screenshotInteractionMode: action.screenshotInteractionMode,
       };
 
+    case SET_TAPPED_WIDGET_INFO:
+      return {
+        ...state,
+        tappedWidgetInfo: action.tappedWidgetInfo,
+      };
+  
     case SET_COORD_START:
       return {
         ...state,

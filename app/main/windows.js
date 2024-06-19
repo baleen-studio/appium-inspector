@@ -86,6 +86,12 @@ export function setupMainWindow({splashUrl, mainUrl, isDev}) {
         },
       },
       {
+        label: 'Enter text',
+        click() {
+          mainWindow.webContents.send('enter-dialog', 'open');
+        },
+      },
+      {
         label: 'Test this value',
         click() {
           mainWindow.webContents.send('check-dialog', 'open');
@@ -94,9 +100,7 @@ export function setupMainWindow({splashUrl, mainUrl, isDev}) {
       {
         label: 'Check existence',
         click() {
-          console.log('send Check existence to render process');
-          mainWindow.webContents.postMessage('check-existence', { message: 'hello' }, []);
-          //mainWindow.webContents.send('check-existence', 'open');
+          mainWindow.webContents.send('check-existence', 'open');
         },
       },
     ]).popup(mainWindow);

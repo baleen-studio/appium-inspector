@@ -110,12 +110,20 @@ main().catch(console.log);`;
   }
 
   codeFor_tap(varNameIgnore, varIndexIgnore, pointerActions) {
-    const {x, y, foundBy, value} = this.getTapCoordinatesFromPointerActions(pointerActions);
+    const {x, y, duration, foundBy, value} = this.getTapCoordinatesFromPointerActions(pointerActions);
     if (!!foundBy && !!value) {
-      return `await driver.touchAction({
+console.log(duration);
+      if (duration > 2000000) {
+        return `await driver.touchAction({
+  action: 'longPress',
+  element: { elementId: find.${foundBy}('${value}') }
+        });`;
+      } else {
+        return `await driver.touchAction({
   action: 'tap',
   element: { elementId: find.${foundBy}('${value}') }
 });`;
+      }
     } else {
     return `await driver.touchAction({
   action: 'tap', x: ${x}, y: ${y}
@@ -125,7 +133,7 @@ main().catch(console.log);`;
 
   codeFor_swipe(varNameIgnore, varIndexIgnore, pointerActions) {
     const {x1, y1, x2, y2, foundBy, value} = this.getSwipeCoordinatesFromPointerActions(pointerActions);
-    if (foundBy && value) {
+    if (!!foundBy && !!value) {
     } else {
       return `await driver.touchAction([
   { action: 'press', x: ${x1}, y: ${y1} },

@@ -1,6 +1,7 @@
 import _ from 'lodash';
-
+import { useSelector } from 'react-redux';
 import {DEFAULT_SWIPE, DEFAULT_TAP, DEFAULT_TEXT, DEFAULT_CHECK, DEFAULT_EXISTENCE} from '../../constants/screenshot';
+//import inspector from '../../reducers/Inspector';
 
 export default class Framework {
   constructor(host, port, path, https, caps) {
@@ -18,8 +19,10 @@ export default class Framework {
 
   getTapCoordinatesFromPointerActions(pointerActions) {
     const pointerMoveAction = pointerActions[DEFAULT_TAP.POINTER_NAME][0];
+    const durationMoveAction = pointerActions[DEFAULT_TAP.POINTER_NAME][2];
     const causedElements = pointerActions[DEFAULT_TAP.POINTER_NAME][4];
     return {x: pointerMoveAction.x, y: pointerMoveAction.y,
+      duration: durationMoveAction.duration,
       foundBy: causedElements.foundBy, value: causedElements.value};
   }
 
@@ -64,6 +67,11 @@ export default class Framework {
 
   get serverUrl() {
     return `${this.scheme}://${this.host}:${this.port}${this.path === '/' ? '' : this.path}`;
+  }
+
+  get automationName() {
+    const value = useSelector(state => state.inspector.automationName);
+    return value;
   }
 
   indent(str, spaces) {
@@ -176,6 +184,7 @@ export default class Framework {
   // Device Interaction
 
   codeFor_shake() {
+    const name = this.automationName();
     return this.codeFor_executeScriptNoArgs('mobile: shake');
   }
 
