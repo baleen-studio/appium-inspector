@@ -3,7 +3,8 @@ import { Modal, Checkbox, Input } from 'antd';
 
 const { TextArea } = Input;
 
-const TextCheckDialog = ({ visible, text, onClose }) => {
+const TextCheckDialog = (props) => {
+  const { visible, text, onClose, t } = props;
   const [checkedValue, setCheckedValue] = useState(true);
   const [textInput, setTextInput] = useState();
   if (text !== '') {
@@ -34,16 +35,16 @@ const TextCheckDialog = ({ visible, text, onClose }) => {
 
   return (
     <Modal
-      title="Test text or not"
+      title={t('Test text')}
       open={visible}
       onOk={handleOk}
-      okText="TEST"
+      okText={t('Test')}
       onCancel={handleCancel}
     >
       <Checkbox onChange={handleCheckboxChange} checked={checkedValue} value="1">Test this text</Checkbox>
       <br /><br />
       <TextArea
-        placeholder="Enter some text..."
+        placeholder={t('Enter some text...')}
         autoSize={{ minRows: 1, maxRows: 3 }}
         value={textInput}
         onChange={handleInputChange}

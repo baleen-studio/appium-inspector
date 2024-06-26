@@ -23,7 +23,8 @@ export default class Framework {
     const causedElements = pointerActions[DEFAULT_TAP.POINTER_NAME][4];
     return {x: pointerMoveAction.x, y: pointerMoveAction.y,
       duration: durationMoveAction.duration,
-      foundBy: causedElements.foundBy, value: causedElements.value};
+      foundBy: causedElements.foundBy, value: causedElements.value,
+      elementId: causedElements.elementId};
   }
 
   getEnterTextFromPointerActions(pointerActions) {
@@ -31,7 +32,8 @@ export default class Framework {
     const enterTextAction = pointerActions[DEFAULT_TEXT.DATA_TYPE][1];
     const causedElements = pointerActions[DEFAULT_TEXT.DATA_TYPE][2];
     return {x: pointerMoveAction.x, y: pointerMoveAction.y, text: enterTextAction.text,
-        foundBy: causedElements.foundBy, value: causedElements.value};
+        foundBy: causedElements.foundBy, value: causedElements.value,
+        elementId: causedElements.elementId};
   }
 
   getCheckTextFromPointerActions(pointerActions) {
@@ -39,7 +41,8 @@ export default class Framework {
     const enterTextAction = pointerActions[DEFAULT_CHECK.DATA_TYPE][1];
     const causedElements = pointerActions[DEFAULT_CHECK.DATA_TYPE][2];
     return {x: pointerMoveAction.x, y: pointerMoveAction.y, text: enterTextAction.text,
-        foundBy: causedElements.foundBy, value: causedElements.value};
+        foundBy: causedElements.foundBy, value: causedElements.value,
+        elementId: causedElements.elementId};
   }
 
   getCheckExistenceFromPointerActions(pointerActions) {
@@ -48,7 +51,8 @@ export default class Framework {
     const enterTextAction = pointerActions[DATA_TYPE][1];
     const causedElements = pointerActions[DATA_TYPE][2];
     return {x: pointerMoveAction.x, y: pointerMoveAction.y, text: enterTextAction.text,
-        foundBy: causedElements.foundBy, value: causedElements.value};
+        foundBy: causedElements.foundBy, value: causedElements.value,
+        elementId: causedElements.elementId};
   }
 
   getSwipeCoordinatesFromPointerActions(pointerActions) {
@@ -62,6 +66,7 @@ export default class Framework {
       y2: pointerMoveActionEnd.y,
       foundBy: causedElements.foundBy,
       value: causedElements.value,
+      elementId: causedElements.elementId
     };
   }
 

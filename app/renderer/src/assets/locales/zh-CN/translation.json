@@ -283,5 +283,16 @@
   "invalidCapType": "无效的capability类型: {{type}}",
   "whitespaceDetected": "文本开始和/或以空格结束",
   "pcloudyCredentialsRequired": "需要 pCloudy 用户名和 api 密钥！",
-  "duplicateCapabilityNameError": "A capability set with the same name already exists"
+  "duplicateCapabilityNameError": "A capability set with the same name already exists",
+  "Edit Text": "Edit Text",
+  "Enter some text...": "Enter some text...",
+  "Test text": "Test text",
+  "Test": "Test",
+  "Confirm existance": "Confirm existance",
+  "Yes": "Yes",
+  "No": "No",
+  "Do you test existence of this widget?": "Do you test existence of this widget?",
+  "Enter text": "Enter text",
+  "Test this value": "Test this value",
+  "Check existence": "Check existence"
 }

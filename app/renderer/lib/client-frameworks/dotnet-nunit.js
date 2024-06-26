@@ -7,6 +7,21 @@ class DotNetNUnitFramework extends Framework {
     return 'csharp';
   }
 
+  getFindString(foundBy, value) {
+    switch (foundBy) {
+      case 'byValueKey':
+        return `_driver.FindElementByAccessibilityId('${value}');`;
+      case 'byType':
+        return `_driver.FindElement(By.XPath("//*[@Type='${value}']"));`;
+      case 'byText':
+        return `_driver.FindElement(By.XPath("//*[@text='${value}']"));`;
+      case 'byTooltip':
+        return `_driver.FindElement(By.XPath("//*[@ToolTip='${value}']"));`;
+      default:
+        return `FlutterElement(driver, finder.by_${foundBy}('${value}'));`;
+    }
+  }
+  
   getCSharpVal(jsonVal) {
     if (Array.isArray(jsonVal)) {
       const convertedItems = jsonVal.map((item) => this.getCSharpVal(item));
@@ -122,6 +137,50 @@ ${this.indent(code, 8)}
     }
   }
 
+  codeFor_text(varName, varIndex, pointerActions) {
+    const {x, y, text, foundBy, value} = this.getEnterTextFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      return `element = ${this.getFindString(foundBy, value)};
+element.SendKeys('${text}');`;
+    } else {
+      return `TouchActions actions = new TouchActions(driver);
+actions.Tap(${x}, ${y});
+actions.Perform();
+string str = "${text}";
+for (int i = 0; i < str.Length; i++) {
+  _driver.PressKeyCode(str[i]);
+}`;
+    }
+  }
+
+  codeFor_check(varName, varIndex, pointerActions) {
+    const {x, y, text, foundBy, value} = this.getCheckTextFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      return `element = ${this.getFindString(foundBy, value)};
+if (element.Text.Equals("${text}")) {
+  Console.WriteLine("Element text is correct");
+} else {
+  Console.WriteLine("Element text is incorrect. Expected: '${text}', Actual: '" + element.Text + "'");
+}`;
+    } else {
+      return this.addComment('checkText not supported');
+    }
+  }
+
+  codeFor_existence(varName, varIndex, pointerActions) {
+    const {x, y, text, foundBy, value} = this.getCheckExistenceFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      return `element = ${this.getFindString(foundBy, value)};
+if (element.Count > 0) {
+  Console.WriteLine("Element exists");
+} else {
+  Console.WriteLine("Element does not exist");
+}`;
+    } else {
+      return this.addComment('existence not supported');
+    }
+  }
+
   codeFor_click(varName, varIndex) {
     return `${this.getVarName(varName, varIndex)}.Click();`;
   }
@@ -135,7 +194,18 @@ ${this.indent(code, 8)}
   }
 
   codeFor_tap(varNameIgnore, varIndexIgnore, pointerActions) {
-    const {x, y} = this.getTapCoordinatesFromPointerActions(pointerActions);
+    const {x, y, duration, foundBy, value} = this.getTapCoordinatesFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      if (duration > 2000000) {
+        return `element = ${this.getFindString(foundBy, value)};
+TouchActions actions = new TouchActions(driver);
+actions.LongPressElement(element);
+actions.Perform();`;
+      } else {
+        return `element = ${this.getFindString(foundBy, value)};
+element.click();`;
+      }
+    } else {
     return `
 var finger = new PointerInputDevice(PointerKind.Touch);
 var tapPoint = new Point(${x}, ${y});
@@ -146,6 +216,7 @@ tap.AddAction(new PauseInteraction(finger, TimeSpan.FromMilliseconds(50)));
 tap.AddAction(finger.CreatePointerUp(MouseButton.Left));
 driver.PerformActions(new List<ActionSequence> { tap });
 `;
+    }
   }
 
   codeFor_swipe(varNameIgnore, varIndexIgnore, pointerActions) {

@@ -3,7 +3,9 @@ import { Modal, Input } from 'antd';
 
 const { TextArea } = Input;
 
-const TextEnterDialog = ({ visible, text, onClose }) => {
+const TextEnterDialog = (props) => {
+  const { visible, text, onClose, t } = props;
+  
   const [textInput, setTextInput] = useState();
   if (text !== '') {
     setTextInput(text);
@@ -28,14 +30,14 @@ const TextEnterDialog = ({ visible, text, onClose }) => {
 
   return (
     <Modal
-      title="Edit Test"
+      title={t('Edit Text')}
       open={visible}
       onOk={handleOk}
-      okText="EDIT"
+      okText={t('Edit')}
       onCancel={handleCancel}
     >
       <TextArea
-        placeholder="Enter some text..."
+        placeholder={t('Enter some text...')}
         autoSize={{ minRows: 1, maxRows: 3 }}
         value={textInput}
         onChange={handleInputChange}

@@ -3,8 +3,8 @@ import { Modal, Input } from 'antd';
 
 const { TextArea } = Input;
 
-const ConfirmExistanceDialog = ({ visible, onClose }) => {
-
+const ConfirmExistanceDialog = (props) => {
+  const { visible, onClose, t } = props;
   const handleOk = () => {
     // Close the dialog
     onClose(true);
@@ -17,14 +17,14 @@ const ConfirmExistanceDialog = ({ visible, onClose }) => {
 
   return (
     <Modal
-      title="Confirm existance"
+      title={t('Confirm existance')}
       open={visible}
-      okText="YES"
+      okText={t('Yes')}
       onOk={handleOk}
       onCancel={handleCancel}
-      cancelText="NO"
+      cancelText={t('No')}
     >
-      Do you test existence of this widget?
+      {t('Do you test existence of this widget?')}
     </Modal>
   );
 };

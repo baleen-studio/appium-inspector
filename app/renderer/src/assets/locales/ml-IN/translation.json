@@ -283,5 +283,16 @@
   "invalidCapType": "Invalid capability type: {{type}}",
   "whitespaceDetected": "Text Starts and/or Ends With Whitespace",
   "pcloudyCredentialsRequired": "pCloudy username and api key are required!",
-  "duplicateCapabilityNameError": "A capability set with the same name already exists"
+  "duplicateCapabilityNameError": "A capability set with the same name already exists",
+  "Edit Text": "Edit Text",
+  "Enter some text...": "Enter some text...",
+  "Test text": "Test text",
+  "Test": "Test",
+  "Confirm existance": "Confirm existance",
+  "Yes": "Yes",
+  "No": "No",
+  "Do you test existence of this widget?": "Do you test existence of this widget?",
+  "Enter text": "Enter text",
+  "Test this value": "Test this value",
+  "Check existence": "Check existence"
 }

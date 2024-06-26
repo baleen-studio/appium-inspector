@@ -270,6 +270,7 @@ export function applyClientMethod(params) {
                     const json = JSON.parse(commandRes.response.message);
                     sub['foundBy'] = json.foundBy;
                     sub['value'] = json.value;
+                    sub['elementId'] = json.elementId;
                   }
                 }
               }

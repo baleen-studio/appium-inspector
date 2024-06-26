@@ -2,6 +2,22 @@ import _ from 'lodash';
 
 import Framework from './framework';
 
+function getFindString(foundBy, value) {
+  switch (foundBy) {
+    case 'byValueKey':
+      return `key_finder = by_value_key '${value}'
+element = ::Appium::Flutter::Element.new(@driver, finder: key_finder)`;
+    case 'byType':
+      return `key_finder = by_type '${value}'
+element = ::Appium::Flutter::Element.new(@driver, finder: key_finder)`;
+    case 'byText':
+      return `text_finder = by_text '${value}'
+element = ::Appium::Flutter::Element.new(@driver, finder: text_finder)`;
+    case 'byTooltip':
+      return `tooltip_finder = by_tooltip '${value}'
+element = ::Appium::Flutter::Element.new(@driver, finder: tooltip_finder)`;
+  }
+}
 class RubyFramework extends Framework {
   get language() {
     return 'ruby';
@@ -71,15 +87,36 @@ driver.quit`;
   }
 
   codeFor_text(varName, varIndex, pointerActions) {
-    return '';
+    const {x, y, text, foundBy, value} = this.getEnterTextFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      return `${getFindString(foundBy, value)}
+element.send_keys('${text}')`;
+    } else {
+      return `driver.tap([(${x}, ${y})])
+'${text}'.each_char do |char|
+  driver.send_keys(char)`;
+    }
   }
 
   codeFor_check(varName, varIndex, pointerActions) {
-    return '';
+    const {x, y, text, foundBy, value} = this.getCheckTextFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      return `${getFindString(foundBy, value)}
+assert_equal '${text}', element.text`;
+    } else {
+      return this.addComment('checkText not supported');
+    }
   }
 
   codeFor_existence(varName, varIndex, pointerActions) {
-    return '';
+    const {x, y, text, foundBy, value} = this.getCheckExistenceFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      return `${getFindString(foundBy, value)}
+if element.nil?
+  puts "not exists"`;
+    } else {
+      return this.addComment('existence not supported');
+    }
   }
 
   codeFor_click(varName, varIndex) {
@@ -95,26 +132,34 @@ driver.quit`;
   }
 
   codeFor_tap(varNameIgnore, varIndexIgnore, pointerActions) {
-    const {x, y} = this.getTapCoordinatesFromPointerActions(pointerActions);
-    return `driver
-  .action
-  .move_to_location(${x}, ${y})
-  .pointer_down(:left)
-  .release
-  .perform
-`;
+    const {x, y, duration, foundBy, value} = this.getTapCoordinatesFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      if (duration > 2000000) {
+        return `${getFindString(foundBy, value)}
+driver.press(element, duration: 2000)`;
+      } else {
+        return `${getFindString(foundBy, value)}
+element.click`;
+      }
+    } else {
+      return `driver
+.action
+.move_to_location(${x}, ${y})
+.pointer_down(:left)
+.release
+.perform`;
+    }
   }
 
   codeFor_swipe(varNameIgnore, varIndexIgnore, pointerActions) {
     const {x1, y1, x2, y2} = this.getSwipeCoordinatesFromPointerActions(pointerActions);
     return `driver
-  .action
-  .move_to_location(${x1}, ${y1})
-  .pointer_down(:left)
-  .move_to_location(${x2}, ${y2})
-  .release
-  .perform
-`;
+.action
+.move_to_location(${x1}, ${y1})
+.pointer_down(:left)
+.move_to_location(${x2}, ${y2})
+.release
+.perform`;
   }
 
   // Execute Script

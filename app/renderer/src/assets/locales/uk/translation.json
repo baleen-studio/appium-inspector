@@ -283,5 +283,16 @@
   "invalidCapType": "Недійсний тип можливості: {{type}}",
   "whitespaceDetected": "Текст починається та/або закінчується пробілом",
   "pcloudyCredentialsRequired": "Необхідні ім'я користувача та API ключ від pCloudy!",
-  "duplicateCapabilityNameError": "Набір можливостей з таким ім'ям вже існує"
+  "duplicateCapabilityNameError": "Набір можливостей з таким ім'ям вже існує",
+  "Edit Text": "Edit Text",
+  "Enter some text...": "Enter some text...",
+  "Test text": "Test text",
+  "Test": "Test",
+  "Confirm existance": "Confirm existance",
+  "Yes": "Yes",
+  "No": "No",
+  "Do you test existence of this widget?": "Do you test existence of this widget?",
+  "Enter text": "Enter text",
+  "Test this value": "Test this value",
+  "Check existence": "Check existence"
 }

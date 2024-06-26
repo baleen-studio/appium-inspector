@@ -59,7 +59,7 @@ main().catch(console.log);`;
   codeFor_text(varName, varIndex, pointerActions) {
     const {x, y, text, foundBy, value} = this.getEnterTextFromPointerActions(pointerActions);
     if (!!foundBy && !!value) {
-      return `await driver.elementSendKeys(find.${foundBy}('${value}'), '${text}t');`;
+      return `await driver.elementSendKeys(find.${foundBy}('${value}'), '${text}');`;
     } else {
       return `await driver.textAction({
   action: 'enterText', x: ${x}, y: ${y}, text: '${text}'
@@ -76,24 +76,25 @@ main().catch(console.log);`;
   '${text}'
 );`;
     } else {
-      return `await driver.textAction({
-  action: 'enterText', x: ${x}, y: ${y}, text: '${text}'
-});`;
+      return this.addComment(`checkText not supported`);
     }
   }
 
   codeFor_existence(varName, varIndex, pointerActions) {
     const {x, y, text, foundBy, value} = this.getCheckExistenceFromPointerActions(pointerActions);
     if (!!foundBy && !!value) {
-      return `assert.strictEqual(
-  await driver.getElementText(
-    await driver.elementSendKeys(find.${foundBy}('${value}')),
-  '${text}'
-);`;
+      return `try {
+  await await driver.findElement(find.${foundBy}('${value}'), 5000);
+  // "Widget found!
+} catch (error) {
+  if (error.name === 'TimeoutException') {
+    // Widget not found!
+  } else {
+    // Handle other potential errors
+  }
+}`;
     } else {
-      return `await driver.textAction({
-  action: 'enterText', x: ${x}, y: ${y}, text: '${text}'
-});`;
+      return this.addComment(`existence not supported`);
     }
   }
 
@@ -112,7 +113,6 @@ main().catch(console.log);`;
   codeFor_tap(varNameIgnore, varIndexIgnore, pointerActions) {
     const {x, y, duration, foundBy, value} = this.getTapCoordinatesFromPointerActions(pointerActions);
     if (!!foundBy && !!value) {
-console.log(duration);
       if (duration > 2000000) {
         return `await driver.touchAction({
   action: 'longPress',
@@ -133,14 +133,14 @@ console.log(duration);
 
   codeFor_swipe(varNameIgnore, varIndexIgnore, pointerActions) {
     const {x1, y1, x2, y2, foundBy, value} = this.getSwipeCoordinatesFromPointerActions(pointerActions);
-    if (!!foundBy && !!value) {
-    } else {
+    //if (!!foundBy && !!value) {
+    //} else {
       return `await driver.touchAction([
   { action: 'press', x: ${x1}, y: ${y1} },
   { action: 'moveTo', x: ${x2}, y: ${y2} },
   'release'
 ]);`;
-    }
+    //}
   }
 
   // Execute Script

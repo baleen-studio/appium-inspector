@@ -282,6 +282,17 @@
   "noResultsFound": "一致する結果が見つかりませんでした",
   "invalidCapType": "無効な Capability: {{type}}",
   "whitespaceDetected": "空白文字で開始または終了します",
-  "pcloudyCredentialsRequired": "pCloudy username and api key are required!",
-  "duplicateCapabilityNameError": "A capability set with the same name already exists"
+  "pcloudyCredentialsRequired": "pCloudyのユーザー名とapi keyが必要です!",
+  "duplicateCapabilityNameError": "同じ名前の機能がすでに登録されています",
+  "Edit Text": "文字列編集",
+  "Enter some text...": "何らかの文字列を入力...",
+  "Test text": "文字列をテスト",
+  "Test": "テスト",
+  "Confirm existance": "存在確認",
+  "Yes": "はい",
+  "No": "いいえ",
+  "Do you test existence of this widget?": "このwidgetが存在するか確認しますか?",
+  "Enter text": "文字列入力",
+  "Test this value": "この値をテスト",
+  "Check existence": "存在確認"
 }

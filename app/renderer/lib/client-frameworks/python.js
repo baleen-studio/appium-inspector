@@ -2,6 +2,21 @@ import _ from 'lodash';
 
 import Framework from './framework';
 
+function getFindString(foundBy, value) {
+  switch (foundBy) {
+    case 'byValueKey':
+      return `FlutterElement(driver, finder.by_value_key('${value}'))`;
+    case 'byType':
+      return `FlutterElement(driver, finder.by_type(${value}))`;
+    case 'byText':
+      return `FlutterElement(driver, finder.by_text('${value}'))`;
+    case 'byTooltip':
+      return `FlutterElement(driver, finder.by_tooltip('${value}'))`;
+    default:
+      return `FlutterElement(driver, finder.by_${foundBy}('${value}'))`;
+  }
+}
+
 class PythonFramework extends Framework {
   get language() {
     return 'python';
@@ -85,15 +100,41 @@ driver.quit()`;
   }
 
   codeFor_text(varName, varIndex, pointerActions) {
-    return '';
+    const {x, y, text, foundBy, value} = this.getEnterTextFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      return `element = ${getFindString(foundBy, value)}
+element.send_keys('${text}')`;
+    } else {
+      return `driver.tap([(${x}, ${y})])
+for char in '${text}':
+  driver.press_key(char)`;
+    }
   }
 
   codeFor_check(varName, varIndex, pointerActions) {
-    return '';
+    const {x, y, text, foundBy, value} = this.getCheckTextFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      return `element = ${getFindString(foundBy, value)}
+if element.text == '${text}':
+  print("Both strings are equal")
+else:
+  print("Both strings are not equal")`;
+    } else {
+      return this.addComment('checkText not supported');
+    }
   }
 
   codeFor_existence(varName, varIndex, pointerActions) {
-    return '';
+    const {x, y, text, foundBy, value} = this.getCheckExistenceFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      return `element = ${getFindString(foundBy, value)}
+if element:
+  print("Element found!")
+else:
+  print("Element not found!")`;
+    } else {
+      return this.addComment('existence not supported');
+    }
   }
 
   codeFor_click(varName, varIndex) {
@@ -109,7 +150,20 @@ driver.quit()`;
   }
 
   codeFor_tap(varNameIgnore, varIndexIgnore, pointerActions) {
-    const {x, y} = this.getTapCoordinatesFromPointerActions(pointerActions);
+    const {x, y, duration, foundBy, value} = this.getTapCoordinatesFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      if (duration > 2000000) {
+        return `element = ${getFindString(foundBy, value)}
+touch_action = TouchAction(driver)
+long_press = touch_action.long_press(element, duration=2000)
+tap_release = touch_action.press(element).release()
+combined_action = touch_action.add(long_press, tap_release)
+combined_action.perform()`;
+      } else {
+        return `element = ${getFindString(foundBy, value)}
+element.click()`;
+      }
+    } else {
     return `actions = ActionChains(driver)
 actions.w3c_actions = ActionBuilder(driver, mouse=PointerInput(interaction.POINTER_TOUCH, "touch"))
 actions.w3c_actions.pointer_action.move_to_location(${x}, ${y})
@@ -118,6 +172,7 @@ actions.w3c_actions.pointer_action.pause(0.1)
 actions.w3c_actions.pointer_action.release()
 actions.perform()
 `;
+    }
   }
 
   codeFor_swipe(varNameIgnore, varIndexIgnore, pointerActions) {

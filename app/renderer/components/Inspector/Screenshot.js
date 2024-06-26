@@ -141,8 +141,22 @@ const Screenshot = (props) => {
     setEnterVisible(false);
 //    setEnterEditing(false);
     if (check) {
+      const {POINTER_NAME, DURATION_1, DURATION_2, BUTTON} = DEFAULT_TAP;
       const {DATA_TYPE} = DEFAULT_TEXT;
-      const {DURATION_1} = DEFAULT_TAP;
+      const commandRes = await applyClientMethod({
+        methodName: TAP,
+        args: [
+          {
+            [POINTER_NAME]: [
+              {type: POINTER_MOVE, duration: DURATION_1, x: clickX, y: clickY},
+              {type: POINTER_DOWN, button: BUTTON},
+              {type: PAUSE, duration: DURATION_2},
+              {type: POINTER_UP, button: BUTTON},
+              {foundBy: '', value: ''},
+            ],
+          },
+        ],
+      });
       applyClientMethod({
         methodName: TEXT,
         args: [
@@ -407,17 +421,17 @@ const Screenshot = (props) => {
       </div>
       {checkVisible && (
         <>
-          <TextCheckDialog visible={checkVisible} text={checkText} onClose={handleCloseCheck} />
+          <TextCheckDialog visible={checkVisible} text={checkText} onClose={handleCloseCheck} {...props} />
         </>
       )}
       {enterVisible && (
         <>
-          <TextEnterDialog visible={enterVisible} text={enterText} onClose={handleCloseEnter} />
+          <TextEnterDialog visible={enterVisible} text={enterText} onClose={handleCloseEnter} {...props} />
         </>
       )}
-      {(
+      {(existenceVisible &&
         <>
-          <ConfirmExistanceDialog visible={existenceVisible} onClose={handleCloseExistence} />
+          <ConfirmExistanceDialog visible={existenceVisible} onClose={handleCloseExistence} {...props} />
         </>
       )}
     </Spin>

@@ -91,15 +91,36 @@ class JavaFramework extends Framework {
   }
 
   codeFor_text(varName, varIndex, pointerActions) {
-    return '';
+    const {x, y, text, foundBy, value} = this.getEnterTextFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      return `find.${foundBy}("${value}").sendKeys("${text}");`;
+    } else {
+      return `${this.getVarName(varName, varIndex)}.sendKeys(${JSON.stringify(text)});`;
+    }
   }
 
   codeFor_check(varName, varIndex, pointerActions) {
-    return '';
+    const {x, y, text, foundBy, value} = this.getCheckTextFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      return `assertEquals(find.${foundBy}("${value}").getText(), "${text}");`;
+    } else {
+      return `await driver.textAction({
+  action: 'enterText', x: ${x}, y: ${y}, text: '${text}'
+});`;
+    }
   }
 
   codeFor_existence(varName, varIndex, pointerActions) {
-    return '';
+    const {x, y, text, foundBy, value} = this.getCheckExistenceFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      return `if (driver.isElementPresent(find.${foundBy}("${value}")) {
+  // Widget found!
+} else {
+  // Widget not found!
+}`;
+    } else {
+      return '// existence not supported';
+    }
   }
 
   codeFor_click(varName, varIndex) {
@@ -115,7 +136,17 @@ class JavaFramework extends Framework {
   }
 
   codeFor_tap(varNameIgnore, varIndexIgnore, pointerActions) {
-    const {x, y} = this.getTapCoordinatesFromPointerActions(pointerActions);
+    const {x, y, duration, foundBy, value} = this.getTapCoordinatesFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      if (duration > 2000000) {
+        return `
+TouchActions action = new TouchActions(driver);
+action.longPress(find.${foundBy}("${value}"));
+action.perform();`;
+      } else {
+        return `clickToElement(find.${foundBy}("${value}"));`;
+      }
+    } else {
     return `
 final var finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
 var tapPoint = new Point(${x}, ${y});
@@ -126,7 +157,8 @@ tap.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
 tap.addAction(new Pause(finger, Duration.ofMillis(50)));
 tap.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 driver.perform(Arrays.asList(tap));
-    `;
+`;
+    }
   }
 
   codeFor_swipe(varNameIgnore, varIndexIgnore, pointerActions) {
