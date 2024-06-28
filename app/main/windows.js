@@ -86,19 +86,19 @@ export function setupMainWindow({splashUrl, mainUrl, isDev}) {
         },
       },
       {
-        label: 'Enter text',
+        label: i18n.t('Enter text'),
         click() {
           mainWindow.webContents.send('enter-dialog', 'open');
         },
       },
       {
-        label: 'Test this value',
+        label: i18n.t('Test this value'),
         click() {
           mainWindow.webContents.send('check-dialog', 'open');
         },
       },
       {
-        label: 'Check existence',
+        label: i18n.t('Check existence'),
         click() {
           mainWindow.webContents.send('check-existence', 'open');
         },

@@ -12,6 +12,21 @@ class JsOxygenFramework extends Framework {
     return 'mob';
   }
 
+  getFindString(foundBy, value) {
+    switch (foundBy) {
+      case 'byValueKey':
+        return `'//*[@key="${value}"]'`;
+      case 'byType':
+        return `'//*[@type="${value}"]'`;
+      case 'byText':
+        return `'//*[@text="${value}"]'`;
+      case 'byTooltip':
+        return `'//*[@tooltip="${value}"]'`;
+      default:
+        return `'//*[@${foundBy}="${value}"]'`;
+    }
+  }
+
   wrapWithBoilerplate(code) {
     return `// This sample code uses the Oxygen HQ client library
 // (npm install oxygen-cli -g)
@@ -58,16 +73,30 @@ ${code}`;
   }
 
   codeFor_text(varName, varIndex, pointerActions) {
-    const {x, y, text} = this.getEnterTextFromPointerActions(pointerActions);
-    return `${this.type}.enterText(${x}, ${y}, '${text}'};`;
+    const {x, y, text, foundBy, value} = this.getEnterTextFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      return `${this.type}.type(${this.getFindString(foundBy, value)}, '${text}'};`;
+    } else {
+      return `${this.type}.type(${x}, ${y}, '${text}'};`;
+    }
   }
 
   codeFor_check(varName, varIndex, pointerActions) {
-    return '';
+    const {x, y, text, foundBy, value} = this.getCheckTextFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      return `assertText(${this.getFindString(foundBy, value)}, '${text}');`;
+    } else {
+      return this.addComment(`checkText not supported`);
+    }
   }
 
   codeFor_existence(varName, varIndex, pointerActions) {
-    return '';
+    const {x, y, text, foundBy, value} = this.getCheckExistenceFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      return `isExist(${this.getFindString(foundBy, value)});`;
+    } else {
+      return this.addComment(`existence not supported`);
+    }
   }
 
   codeFor_click(varName, varIndex) {
@@ -83,8 +112,16 @@ ${code}`;
   }
 
   codeFor_tap(varNameIgnore, varIndexIgnore, pointerActions) {
-    const {x, y} = this.getTapCoordinatesFromPointerActions(pointerActions);
-    return `${this.type}.tap(${x}, ${y});`;
+    const {x, y, duration, foundBy, value} = this.getTapCoordinatesFromPointerActions(pointerActions);
+    if (!!foundBy && !!value) {
+      if (duration > 2000000) {
+        return `${this.type}.clickLong(${this.getFindString(foundBy, value)}, 2000);`;
+      } else {
+        return `${this.type}.click(${this.getFindString(foundBy, value)});`;
+      }
+    } else {
+      return `${this.type}.tap(${x}, ${y});`;
+    }
   }
 
   codeFor_swipe(varNameIgnore, varIndexIgnore, pointerActions) {

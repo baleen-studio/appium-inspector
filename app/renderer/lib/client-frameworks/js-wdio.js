@@ -84,7 +84,7 @@ main().catch(console.log);`;
     const {x, y, text, foundBy, value} = this.getCheckExistenceFromPointerActions(pointerActions);
     if (!!foundBy && !!value) {
       return `try {
-  await await driver.findElement(find.${foundBy}('${value}'), 5000);
+  await driver.findElement(find.${foundBy}('${value}'), 5000);
   // "Widget found!
 } catch (error) {
   if (error.name === 'TimeoutException') {
