@@ -70,7 +70,6 @@ const Inspector = (props) => {
     selectedElement = {},
     quitSession,
     screenshotInteractionMode,
-    tappedWidgetInfo,
     visibleCommandMethod,
     selectedInspectorTab,
     selectInspectorTab,

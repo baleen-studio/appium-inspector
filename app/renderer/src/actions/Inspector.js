@@ -626,12 +626,6 @@ export function selectScreenshotInteractionMode(screenshotInteractionMode) {
   };
 }
 
-export function setTappedWidgetInfo(info) {
-  return (dispatch) => {
-    dispatch({type: SET_TAPPED_WIDGET_INFO, info});
-  }
-}
-
 export function toggleRefreshingState() {
   return (dispatch) => {
     dispatch({type: TOGGLE_REFRESHING_STATE});

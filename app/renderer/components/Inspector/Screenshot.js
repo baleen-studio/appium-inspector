@@ -10,7 +10,6 @@ import {INSPECTOR_TABS} from '../../constants/session-inspector';
 import HighlighterRects from './HighlighterRects';
 import styles from './Inspector.css';
 import CheckableTag from 'antd/lib/tag/CheckableTag';
-import { setTappedWidgetInfo } from '../../actions/Inspector';
 
 const {POINTER_UP, POINTER_DOWN, PAUSE, POINTER_MOVE, FOUND_BY} = POINTER_TYPES;
 const {ENTER_TEXT, CHECK_TEXT, CHECK_EXISTENCE} = TEXT_TYPES;
@@ -31,7 +30,6 @@ const Screenshot = (props) => {
     mjpegScreenshotUrl,
     methodCallInProgress,
     screenshotInteractionMode,
-    tappedWidgetInfo,
     coordStart,
     coordEnd,
     scaleRatio,
@@ -104,9 +102,9 @@ const Screenshot = (props) => {
         args: [
           {
             [DATA_TYPE]: [
-              {type: POINTER_MOVE, duration: DURATION_1, x: clickX/*tappedWidgetInfo.x*/, y: clickY/*tappedWidgetInfo.y*/},
+              {type: POINTER_MOVE, duration: DURATION_1, x: clickX, y: clickY},
               {type: CHECK_EXISTENCE, text: ''},
-              {foundBy: tappedWidgetInfo.foundBy, value: tappedWidgetInfo.value},
+              {foundBy: '', value: ''},
             ],
           },
         ],
@@ -125,9 +123,9 @@ const Screenshot = (props) => {
         args: [
           {
             [DATA_TYPE]: [
-              {type: POINTER_MOVE, duration: DURATION_1, x: clickX/*tappedWidgetInfo.x*/, y: clickY/*tappedWidgetInfo.y*/},
+              {type: POINTER_MOVE, duration: DURATION_1, x: clickX, y: clickY},
               {type: CHECK_TEXT, text: text},
-              {foundBy: tappedWidgetInfo.foundBy, value: tappedWidgetInfo.value},
+              {foundBy: '', value: ''},
             ],
           },
         ],
@@ -162,9 +160,9 @@ const Screenshot = (props) => {
         args: [
           {
             [DATA_TYPE]: [
-              {type: POINTER_MOVE, duration: DURATION_1, x: clickX/*tappedWidgetInfo.x*/, y: clickY/*tappedWidgetInfo.y*/},
+              {type: POINTER_MOVE, duration: DURATION_1, x: clickX, y: clickY},
               {type: ENTER_TEXT, text: text},
-              {foundBy: tappedWidgetInfo.foundBy, value: tappedWidgetInfo.value},
+              {foundBy: '', value: ''},
             ],
           },
         ],
@@ -197,36 +195,6 @@ const Screenshot = (props) => {
       } else {
         commandRes = await handleDoSwipe({x, y}); // Pass coordEnd because otherwise it is not retrieved
       }
-      /*
-      if (commandRes.response) {
-        try {
-          var message = JSON.parse(commandRes.response.message);
-          const tapInfo = {x: x, y: y, text: message.text, foundBy: message.foundBy, value: message.value};
-          setTappedWidgetInfo(tapInfo);
-          switch (message.type) {
-            case 'TextField':
-            case 'TextFormField':
-              await setClickX(x);
-              await setClickY(y);
-//              setEnterText(message.text);
-              setEnterVisible(true);
-//              setEnterEditing(true);
-              break;
-            case 'Text':
-              await setClickX(x);
-              await setClickY(y);
-//              setCheckText(message.text);
-              setCheckVisible(true);
-//              setCheckEditing(true);
-              break;
-          }
-        } catch (e) {
-          console.log(e);
-        }
-      } else {
-        console.log(commandRes);
-      }
-        */
       clearCoordAction();
     }
   };

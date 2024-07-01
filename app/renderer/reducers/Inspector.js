@@ -114,7 +114,6 @@ const INITIAL_STATE = {
   isSearchingForElements: false,
   assignedVarCache: {},
   screenshotInteractionMode: SCREENSHOT_INTERACTION_MODE.SELECT,
-  tappedWidgetInfo: {},
   searchedForElementBounds: null,
   selectedInspectorTab: INSPECTOR_TABS.SOURCE,
   appMode: APP_MODE.NATIVE,
@@ -420,12 +419,6 @@ export default function inspector(state = INITIAL_STATE, action) {
       return {
         ...state,
         screenshotInteractionMode: action.screenshotInteractionMode,
-      };
-
-    case SET_TAPPED_WIDGET_INFO:
-      return {
-        ...state,
-        tappedWidgetInfo: action.tappedWidgetInfo,
       };
   
     case SET_COORD_START:
