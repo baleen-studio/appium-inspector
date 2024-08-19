@@ -182,19 +182,6 @@ const SelectedElement = (props) => {
             onClick={() => applyClientMethod({
               methodName: 'click',
               elementId: selectedElementId,
-              args: [
-                /*
-                {
-                  [POINTER_NAME]: [
-                    {type: POINTER_MOVE, duration: DURATION_1, x: selectedElement.attributes.centerX, y: selectedElement.attributes.centerY},
-                    {type: POINTER_DOWN, button: BUTTON},
-                    {type: PAUSE, duration: DURATION_2},
-                    {type: POINTER_UP, button: BUTTON},
-                    {foundBy: '', value: ''},
-                  ],
-                },
-                */
-              ],
             })}
           />
         </Tooltip>

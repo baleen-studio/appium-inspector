@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { Modal, Input } from 'antd';
 
 const { TextArea } = Input;
 
 const TextEnterDialog = (props) => {
-  const { visible, text, onClose, t } = props;
+  const { visible, text, key, onClose, t } = props;
   
-  const [textInput, setTextInput] = useState();
-  if (text !== '') {
-    setTextInput(text);
-  }
+  const [textInput, setTextInput] = useState(text);
 
   const handleInputChange = e => {
     setTextInput(e.target.value);
@@ -30,6 +27,7 @@ const TextEnterDialog = (props) => {
 
   return (
     <Modal
+      key={key}
       title={t('Edit Text')}
       open={visible}
       onOk={handleOk}

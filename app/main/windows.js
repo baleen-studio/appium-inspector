@@ -58,6 +58,9 @@ export function setupMainWindow({splashUrl, mainUrl, isDev}) {
 
   mainWindow.loadURL(mainUrl);
 
+  let automationName = '';
+  let gotAutomationName = false;
+
   mainWindow.webContents.on('did-finish-load', () => {
     splashWindow.destroy();
     mainWindow.show();
@@ -68,15 +71,31 @@ export function setupMainWindow({splashUrl, mainUrl, isDev}) {
     }
   });
 
+  ipcMain.on('automation-name', async (_event, value) => {
+    console.log(value); // will print value to Node console
+    automationName = value;
+    gotAutomationName = true;
+  });
+  
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
 
   const handleCloseCheck = async (check, text) => {
   }
-
+  
+  function wait(milleseconds) {
+    return new Promise(resolve => setTimeout(resolve, milleseconds));
+  }
+  
   mainWindow.webContents.on('context-menu', (e, props) => {
     const {x, y} = props;
+
+    gotAutomationName = false;
+    mainWindow.webContents.send('get-automation-name', 'open');
+    while (!gotAutomationName) {
+      wait(200);
+    }
 
     Menu.buildFromTemplate([
       {

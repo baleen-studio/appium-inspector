@@ -116,6 +116,7 @@ export default class AppiumClient {
       }
 
       // and then execute whatever method we requested on the actual element
+      console.log(cachedEl.el);
       res = await cachedEl.el[methodName].apply(cachedEl.el, args);
     } else {
       // Specially handle the tap and swipe method

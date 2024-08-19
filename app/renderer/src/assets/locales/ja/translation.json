@@ -293,6 +293,6 @@
   "No": "いいえ",
   "Do you test existence of this widget?": "このwidgetが存在するか確認しますか?",
   "Enter text": "文字列入力",
-  "Test this value": "この値をテスト",
+  "Test this value": "期待する文字列を入力",
   "Check existence": "存在確認"
 }

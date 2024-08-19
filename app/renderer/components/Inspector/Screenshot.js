@@ -1,5 +1,5 @@
 import {Spin} from 'antd';
-import React, {useRef, useState, useEffect} from 'react';
+import React, {useRef, useState, useCallback, useMemo} from 'react';
 
 import {GESTURE_ITEM_STYLES, POINTER_TYPES, TEXT_TYPES} from '../../constants/gestures';
 import {DEFAULT_SWIPE, DEFAULT_TAP, SCREENSHOT_INTERACTION_MODE, DEFAULT_TEXT, DEFAULT_CHECK, DEFAULT_EXISTENCE} from '../../constants/screenshot';
@@ -15,17 +15,15 @@ const {POINTER_UP, POINTER_DOWN, PAUSE, POINTER_MOVE, FOUND_BY} = POINTER_TYPES;
 const {ENTER_TEXT, CHECK_TEXT, CHECK_EXISTENCE} = TEXT_TYPES;
 const {TAP, SELECT, SWIPE, TAP_SWIPE, TEXT, CHECK, EXISTENCE} = SCREENSHOT_INTERACTION_MODE;
 
-//const { main } = require('electron-dialogs');
 const { ipcRenderer } = require('electron');
 const prompt = require('electron-prompt');
-//import PromptManager from "electron-prompts"
-//const prompts = new PromptManager()
 
 /**
  * Shows screenshot of running application and divs that highlight the elements' bounding boxes
  */
 const Screenshot = (props) => {
   const {
+    driver,
     screenshot,
     mjpegScreenshotUrl,
     methodCallInProgress,
@@ -40,55 +38,152 @@ const Screenshot = (props) => {
   } = props;
 
   const containerEl = useRef();
+  const enterWidget = useRef(false);
+  const checkWidget = useRef(false);
   const [x, setX] = useState();
   const [y, setY] = useState();
   const [clickX, setClickX] = useState();
   const [clickY, setClickY] = useState();
   const [checkVisible, setCheckVisible] = useState(false);
   const [enterVisible, setEnterVisible] = useState(false);
-//  const [checkEditing, setCheckEditing] = useState(false);
-//  const [enterEditing, setEnterEditing] = useState(false);
+  const [existenceVisible, setExistenceVisible] = useState(false);
   const [checkText, setCheckText] = useState('');
   const [enterText, setEnterText] = useState('');
-  const [existenceVisible, setExistenceVisible] = useState(false);
   const [date,setDate] = useState(new Date());
+  const [forceRenderKey, setForceRenderKey] = useState(0);
 
-  ipcRenderer.on('check-dialog',  async (e, m) => {
+  ipcRenderer.on('get-automation-name', async (e, m) => {
+    //e.sender.send('automation-name', driver.client.capabilities.automationName);
+    ipcRenderer.send('automation-name', driver.client.capabilities.automationName);
+  });
+
+  ipcRenderer.once('check-dialog',  async (e, m) => {
     if (!checkVisible) {
       const {setCoordEnd, clearCoordAction} = props;
-      if (!clickX || !clickY) {
+      //if (!clickX || !clickY) {
         await setCoordEnd(x, y);
         await setClickX(x);
         await setClickY(y);
         await setCheckVisible(true);
         clearCoordAction();
-      }
+      //}
     }
   });
 
-  ipcRenderer.on('enter-dialog',  async (e, m) => {
-    if (!checkVisible) {
+  setInterval(async () => {
+    if (checkVisible && !checkWidget.current) {
+      checkWidget.current = true;
+      try {
+        const params = JSON.stringify({"x":clickX,"y":clickY});
+        const element = await driver.executeScript('flutter:requestData', [`findByPosition:${params}`]);
+        const result = JSON.parse(element.response.message);
+        setCheckText(result.text);
+        setForceRenderKey(prevKey => prevKey + 1);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }, 100);
+
+  const handleCloseCheck = async (check, text) => {
+    setCheckVisible(false);
+    setCheckText(text);
+    checkWidget.current = false;
+    if (check) {
+      const {DATA_TYPE} = DEFAULT_CHECK;
+      const {DURATION_1} = DEFAULT_TAP;
+      applyClientMethod({
+        methodName: CHECK,
+        args: [
+          {
+            [DATA_TYPE]: [
+              {type: POINTER_MOVE, duration: DURATION_1, x: clickX, y: clickY},
+              {type: CHECK_TEXT, text: text},
+              {foundBy: '', value: ''},
+            ],
+          },
+        ],
+      });
+      setClickX(undefined);
+      setClickY(undefined);
+    }
+  };
+
+  ipcRenderer.once('enter-dialog',  async (e, m) => {
+    if (!enterVisible) {
       const {setCoordEnd, clearCoordAction} = props;
-      if (!clickX || !clickY) {
+      //if (!clickX || !clickY) {
         await setCoordEnd(x, y);
         await setClickX(x);
         await setClickY(y);
         await setEnterVisible(true);
+        //await setEnterText('abc123');
         clearCoordAction();
-      }
+      //}
     }
   });
 
-  ipcRenderer.on('check-existence',  async (e, m) => {
+  setInterval(async () => {
+    if (enterVisible && !enterWidget.current) {
+      enterWidget.current = true;
+      try {
+        const params = JSON.stringify({"x":clickX,"y":clickY});
+        const element = await driver.executeScript('flutter:requestData', [`findByPosition:${params}`]);
+        const result = JSON.parse(element.response.message);
+        setEnterText(result.text);
+        setForceRenderKey(prevKey => prevKey + 1);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }, 100);
+
+  const handleCloseEnter = async (check, text) => {
+    setEnterVisible(false);
+    setEnterText(text);
+    enterWidget.current = false;
+    if (check) {
+      const {POINTER_NAME, DURATION_1, DURATION_2, BUTTON} = DEFAULT_TAP;
+      const {DATA_TYPE} = DEFAULT_TEXT;
+      const commandRes = await applyClientMethod({
+        methodName: TAP,
+        args: [
+          {
+            [POINTER_NAME]: [
+              {type: POINTER_MOVE, duration: DURATION_1, x: clickX, y: clickY},
+              {type: POINTER_DOWN, button: BUTTON},
+              {type: PAUSE, duration: DURATION_2},
+              {type: POINTER_UP, button: BUTTON},
+              {foundBy: '', value: ''},
+            ],
+          },
+        ],
+      });
+      await applyClientMethod({
+        methodName: TEXT,
+        args: [
+          {
+            [DATA_TYPE]: [
+              {type: POINTER_MOVE, duration: DURATION_1, x: clickX, y: clickY},
+              {type: ENTER_TEXT, text: text},
+              {foundBy: '', value: ''},
+            ],
+          },
+        ],
+      });
+    }
+  };
+
+  ipcRenderer.once('check-existence',  async (e, m) => {
     if (!existenceVisible) {
       const {setCoordEnd, clearCoordAction} = props;
-      if (!clickX || !clickY) {
+      //if (!clickX || !clickY) {
         await setCoordEnd(x, y);
         await setClickX(x);
         await setClickY(y);
         await setExistenceVisible(true);
         clearCoordAction();
-      }
+      //}
     }
   });
 
@@ -111,64 +206,6 @@ const Screenshot = (props) => {
       });
     }
   }
-
-  const handleCloseCheck = async (check, text) => {
-    setCheckVisible(false);
-//    setCheckEditing(false);
-    if (check) {
-      const {DATA_TYPE} = DEFAULT_CHECK;
-      const {DURATION_1} = DEFAULT_TAP;
-      applyClientMethod({
-        methodName: CHECK,
-        args: [
-          {
-            [DATA_TYPE]: [
-              {type: POINTER_MOVE, duration: DURATION_1, x: clickX, y: clickY},
-              {type: CHECK_TEXT, text: text},
-              {foundBy: '', value: ''},
-            ],
-          },
-        ],
-      });
-      setClickX(undefined);
-      setClickY(undefined);
-    }
-  };
-
-  const handleCloseEnter = async (check, text) => {
-    setEnterVisible(false);
-//    setEnterEditing(false);
-    if (check) {
-      const {POINTER_NAME, DURATION_1, DURATION_2, BUTTON} = DEFAULT_TAP;
-      const {DATA_TYPE} = DEFAULT_TEXT;
-      const commandRes = await applyClientMethod({
-        methodName: TAP,
-        args: [
-          {
-            [POINTER_NAME]: [
-              {type: POINTER_MOVE, duration: DURATION_1, x: clickX, y: clickY},
-              {type: POINTER_DOWN, button: BUTTON},
-              {type: PAUSE, duration: DURATION_2},
-              {type: POINTER_UP, button: BUTTON},
-              {foundBy: '', value: ''},
-            ],
-          },
-        ],
-      });
-      applyClientMethod({
-        methodName: TEXT,
-        args: [
-          {
-            [DATA_TYPE]: [
-              {type: POINTER_MOVE, duration: DURATION_1, x: clickX, y: clickY},
-              {type: ENTER_TEXT, text: text},
-              {foundBy: '', value: ''},
-            ],
-          },
-        ],
-      });
-    }
-  };
 
   const handleScreenshotClick = async () => {
     const {tapTickCoordinates} = props;
@@ -389,12 +426,12 @@ const Screenshot = (props) => {
       </div>
       {checkVisible && (
         <>
-          <TextCheckDialog visible={checkVisible} text={checkText} onClose={handleCloseCheck} {...props} />
+          <TextCheckDialog key={forceRenderKey} visible={checkVisible} text={checkText} onClose={handleCloseCheck} {...props} />
         </>
       )}
       {enterVisible && (
         <>
-          <TextEnterDialog visible={enterVisible} text={enterText} onClose={handleCloseEnter} {...props} />
+          <TextEnterDialog key={forceRenderKey} visible={enterVisible} text={enterText} onClose={handleCloseEnter} {...props} />
         </>
       )}
       {(existenceVisible &&

@@ -1,19 +1,11 @@
 import React, { useState } from 'react';
-import { Modal, Checkbox, Input } from 'antd';
+import { Modal, Input } from 'antd';
 
 const { TextArea } = Input;
 
 const TextCheckDialog = (props) => {
-  const { visible, text, onClose, t } = props;
-  const [checkedValue, setCheckedValue] = useState(true);
-  const [textInput, setTextInput] = useState();
-  if (text !== '') {
-    setTextInput(text);
-  }
-
-  const handleCheckboxChange = checkedValue => {
-    setCheckedValue(checkedValue);
-  };
+  const { key, visible, text, onClose, t } = props;
+  const [textInput, setTextInput] = useState(text);
 
   const handleInputChange = e => {
     setTextInput(e.target.value);
@@ -21,11 +13,10 @@ const TextCheckDialog = (props) => {
 
   const handleOk = () => {
     // Do something with checkedValues and textInput
-    console.log('Checked values:', checkedValue);
     console.log('Text input:', textInput);
 
     // Close the dialog
-    onClose(checkedValue, textInput);
+    onClose(true, textInput);
   };
 
   const handleCancel = () => {
@@ -35,13 +26,14 @@ const TextCheckDialog = (props) => {
 
   return (
     <Modal
+      key={key}
       title={t('Test text')}
       open={visible}
       onOk={handleOk}
       okText={t('Test')}
       onCancel={handleCancel}
     >
-      <Checkbox onChange={handleCheckboxChange} checked={checkedValue} value="1">Test this text</Checkbox>
+      Test this text
       <br /><br />
       <TextArea
         placeholder={t('Enter some text...')}
