@@ -1,7 +1,8 @@
+import path from 'node:path';
+
 import {logger} from '@appium/support';
 import axios from 'axios';
 import _ from 'lodash';
-import path from 'node:path';
 
 export const log = logger.getLogger('CROWDIN');
 
@@ -11,7 +12,7 @@ const API_TOKEN = process.env.CROWDIN_TOKEN;
 if (!PROJECT_ID || !API_TOKEN) {
   throw new Error(`Both CROWDIN_PROJECT_ID and CROWDIN_TOKEN environment variables must be set`);
 }
-export const RESOURCES_ROOT = path.resolve('app', 'renderer', 'src', 'assets', 'locales');
+export const RESOURCES_ROOT = path.resolve('app', 'common', 'public', 'locales');
 export const ORIGINAL_LANGUAGE = 'en';
 const USER_AGENT = 'Appium Inspector CI';
 const API_ROOT = 'https://api.crowdin.com/api/v2';

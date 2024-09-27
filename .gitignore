@@ -20,3 +20,4 @@ junit-testresults.xml
 
 # FVM Version Cache
 .fvm/
+.github/workflows/

@@ -1,9 +1,10 @@
+import {
+  installExtension,
+  REACT_DEVELOPER_TOOLS,
+  REDUX_DEVTOOLS,
+} from '@tomjs/electron-devtools-installer';
+
 export async function installExtensions() {
-  const {
-    installExtension,
-    REACT_DEVELOPER_TOOLS,
-    REDUX_DEVTOOLS,
-  } = require('electron-extension-installer');
   const opts = {
     forceDownload: !!process.env.UPGRADE_EXTENSIONS,
     loadExtensionOptions: {

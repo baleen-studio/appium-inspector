@@ -1,19 +1,22 @@
+import {clipboard, ipcMain, shell} from 'electron';
+import settings from 'electron-settings';
+import fs from 'fs';
+
 import i18n from './i18next';
 
-export function getAppiumSessionFilePath(argv, isPackaged, isDev) {
-  if (isDev) {
-    // do not use file launcher in dev mode because argv is different
-    // then it is in production
-    return false;
-  }
-  if (process.platform === 'darwin' && !isDev) {
-    // packaged macOS apps do not receive args from process.argv, they
-    // receive the filepath argument from the `electron.app.on('open-file', cb)` event
-    return false;
-  }
-  const argvIndex = isPackaged ? 1 : 2;
-  return argv[argvIndex];
+export const isDev = process.env.NODE_ENV === 'development';
+
+export function setupIPCListeners() {
+  ipcMain.handle('settings:has', async (_evt, key) => await settings.has(key));
+  ipcMain.handle('settings:set', async (_evt, key, value) => await settings.set(key, value));
+  ipcMain.handle('settings:get', async (_evt, key) => await settings.get(key));
+  ipcMain.on('electron:openLink', (_evt, link) => shell.openExternal(link));
+  ipcMain.on('electron:copyToClipboard', (_evt, text) => clipboard.writeText(text));
+  ipcMain.handle('sessionfile:open', async (_evt, filePath) => openSessionFile(filePath));
 }
+
+// Open an .appiumsession file from the specified path and return its contents
+export const openSessionFile = (filePath) => fs.readFileSync(filePath, 'utf8');
 
 export const t = (string, params = null) => i18n.t(string, params);
 

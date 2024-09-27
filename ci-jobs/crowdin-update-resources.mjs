@@ -1,8 +1,7 @@
-import B from 'bluebird';
 import {createReadStream} from 'node:fs';
 import path from 'node:path';
 
-import {ORIGINAL_LANGUAGE, RESOURCES_ROOT, log, performApiRequest} from './crowdin-common.mjs';
+import {log, ORIGINAL_LANGUAGE, performApiRequest, RESOURCES_ROOT} from './crowdin-common.mjs';
 
 const RESOURCE_NAME = 'translation.json';
 const RESOURCE_PATH = path.resolve(RESOURCES_ROOT, ORIGINAL_LANGUAGE, RESOURCE_NAME);
@@ -42,7 +41,7 @@ async function updateFile(fileId, storageId) {
 }
 
 async function main() {
-  const [storageId, fileId] = await B.all([uploadToStorage(), getFileId()]);
+  const [storageId, fileId] = await Promise.all([uploadToStorage(), getFileId()]);
   await updateFile(fileId, storageId);
   log.info('All done');
 }

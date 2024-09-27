@@ -1,9 +1,9 @@
-import {Menu, app, dialog, shell} from 'electron';
+import {Mpp, dialog, Menu, shell} from 'electron';
 
-import {languageList} from '../../common/configs/i18next.common';
+import {languageList} from '../../common/shared/i18next.config';
+import {APPIUM_SESSION_EXTENSION, isDev, openSessionFile, t} from './helpers';
 import i18n from './i18next';
 import {checkForUpdates} from './updater';
-import {APPIUM_SESSION_EXTENSION, t} from './helpers';
 import {launchNewSessionWindow} from './windows';
 
 const INSPECTOR_DOCS_URL = 'https://appium.github.io/appium-inspector';
@@ -32,18 +32,14 @@ async function openFile(mainWindow) {
   });
   if (!canceled) {
     const filePath = filePaths[0];
-    mainWindow.webContents.send('open-file', filePath);
+    const sessionFileString = openSessionFile(filePath);
+    //mainWindow.webContents.send('open-file', sessionFileString);
+    mainWindow.webContents.send('sessionfile:apply', sessionFileString);
   }
 }
 
-async function saveAs(mainWindow) {
-  const {canceled, filePath} = await dialog.showSaveDialog({
-    title: t('saveAs'),
-    filters: [{name: 'Appium', extensions: [APPIUM_SESSION_EXTENSION]}],
-  });
-  if (!canceled) {
-    mainWindow.webContents.send('save-file', filePath);
-  }
+/*async */function saveAs(mainWindow) {
+  mainWindow.webContents.send('sessionfile:download');
 }
 
 function getLanguagesMenu() {
@@ -120,7 +116,7 @@ function dropdownEdit() {
   };
 }
 
-function dropdownView(isDev) {
+function dropdownView() {
   const submenu = [
     {label: t('Toggle Full Screen'), role: 'togglefullscreen'},
     {label: t('Reset Zoom Level'), role: 'resetZoom'},
@@ -172,21 +168,21 @@ function dropdownHelp() {
   };
 }
 
-function menuTemplate(mainWindow, isMac, isDev) {
+function menuTemplate(mainWindow, isMac) {
   return [
     ...(isMac ? [dropdownApp()] : []),
     dropdownFile(mainWindow, isMac),
     dropdownEdit(),
-    dropdownView(isDev),
+    dropdownView(),
     ...(isMac ? [dropdownWindow()] : []),
     dropdownHelp(),
   ];
 }
 
-export function rebuildMenus(mainWindow, isDev) {
+export function rebuildMenus(mainWindow) {
   const isMac = process.platform === 'darwin';
 
-  const menu = Menu.buildFromTemplate(menuTemplate(mainWindow, isMac, isDev));
+  const menu = Menu.buildFromTemplate(menuTemplate(mainWindow, isMac));
 
   if (isMac) {
     Menu.setApplicationMenu(menu);
